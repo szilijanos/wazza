@@ -1,4 +1,4 @@
-{
+export default {
     "status": "success",
     "results": {
         "napkiiras": "2019-12-20 napon",
@@ -7794,4 +7794,4 @@
             }
         ]
     }
-}
+};
