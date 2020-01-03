@@ -1,6 +1,6 @@
-import './modules/header.js';
-import './modules/footer.js';
-import './modules/schedules.js';
+import './components/header.js';
+import './components/footer.js';
+import './components/schedules.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -13,7 +13,7 @@ template.innerHTML = `
     <app-footer></app-footer>
 `;
 
-window.customElements.define('my-schedules-app', class extends HTMLElement {
+export class App extends HTMLElement {
     constructor() {
         super();
 
@@ -30,4 +30,7 @@ window.customElements.define('my-schedules-app', class extends HTMLElement {
             this.$schedules.schedules = result.results.talalatok;
         })();
     }
-});
+}
+
+window.customElements.define('my-schedules-app', App);
+

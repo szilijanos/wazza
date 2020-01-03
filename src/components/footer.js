@@ -1,12 +1,11 @@
 const template = document.createElement('template');
 template.innerHTML = `
-    <header>
-        <h3>Hello</h3>
-        Here comes the navbar
-    </header>
+    <footer>
+        version: x, last update: DD/MM/YYYY
+    </footer>
 `;
 
-window.customElements.define('app-header', class extends HTMLElement {
+window.customElements.define('app-footer', class extends HTMLElement {
     constructor() {
         super();
         this._shadowRoot = this.attachShadow({ mode: 'open'});
