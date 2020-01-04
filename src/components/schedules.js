@@ -22,7 +22,7 @@ window.customElements.define(
             this.$currentDaySchedulesList.innerHTML = '';
 
             Object.values(this._schedules).forEach(schedule => {
-                const $scheduleItem = document.createElement('div');
+                const $scheduleItem = document.createElement('li');
                 $scheduleItem.innerText = `
                 ${schedule.departureCity}, ${schedule.departureStation} -  ${schedule.arrivalCity}, ${schedule.arrivalStation}
             `;

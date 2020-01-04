@@ -7,7 +7,7 @@ template.innerHTML = `
     <app-header></app-header>
 
     <main>
-        <app-schedules>
+        <app-schedules></app-schedules>
     </main>
 
     <app-footer></app-footer>
