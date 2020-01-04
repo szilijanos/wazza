@@ -17,7 +17,7 @@ export class App extends HTMLElement {
     constructor() {
         super();
 
-        this._shadowRoot = this.attachShadow({mode: 'open'});
+        this._shadowRoot = this.attachShadow({ mode: 'open' });
         this._shadowRoot.appendChild(template.content.cloneNode(true));
 
         this.$schedules = this._shadowRoot.querySelector('app-schedules');
@@ -26,11 +26,12 @@ export class App extends HTMLElement {
     connectedCallback() {
         // Importing temporary development mocks' - to be removed when app is capable to access live data
         (async () => {
-            const result = await import('../mockData/singleDaySchedules.js').then((_module) => _module.default)
+            const result = await import('../mockData/singleDaySchedules.js').then(
+                _module => _module.default,
+            );
             this.$schedules.schedules = result.results.talalatok;
         })();
     }
 }
 
 window.customElements.define('my-schedules-app', App);
-
