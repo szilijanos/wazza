@@ -1,7 +1,6 @@
 const template = document.createElement('template');
 template.innerHTML = `
     <header>
-        <h3>Hello</h3>
         Here comes the navbar
     </header>
 `;

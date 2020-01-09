@@ -1,5 +1,8 @@
+import './resultsHeader.mjs';
+
 const template = document.createElement('template');
 template.innerHTML = `
+    <results-header></results-header>
     <div id="current-schedules">
         <ul></ul>
     </div>
@@ -23,9 +26,7 @@ window.customElements.define(
 
             Object.values(this._schedules).forEach(schedule => {
                 const $scheduleItem = document.createElement('li');
-                $scheduleItem.innerText = `
-                ${schedule.departureCity}, ${schedule.departureStation} -  ${schedule.arrivalCity}, ${schedule.arrivalStation}
-            `;
+                $scheduleItem.innerText = `${schedule.departureCity}, ${schedule.departureStation} - ${schedule.arrivalCity}, ${schedule.arrivalStation}`;
                 this.$currentDaySchedulesList.appendChild($scheduleItem);
             });
         }

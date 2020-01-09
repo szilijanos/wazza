@@ -1,6 +1,6 @@
 import './components/header.js';
 import './components/footer.js';
-import './components/schedules.js';
+import './components/schedules.mjs';
 
 const template = document.createElement('template');
 template.innerHTML = `
