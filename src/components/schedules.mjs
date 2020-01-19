@@ -1,9 +1,17 @@
 import './resultsHeader.mjs';
+import './scheduleItem.mjs';
 
 const template = document.createElement('template');
 template.innerHTML = `
+    <style>
+        ul {
+            padding-inline-start: 0;
+        }
+    </style>
+
     <results-header></results-header>
-    <div id="current-schedules">
+
+    <div id="results-list-body">
         <ul></ul>
     </div>
 `;
@@ -17,16 +25,17 @@ window.customElements.define(
             this._shadowRoot.appendChild(template.content.cloneNode(true));
 
             this.$currentDaySchedulesList = this._shadowRoot.querySelector(
-                '#current-schedules > ul',
+                '#results-list-body > ul',
             );
         }
 
         _renderCurrentDaySchedules() {
             this.$currentDaySchedulesList.innerHTML = '';
 
-            Object.values(this._schedules).forEach(schedule => {
-                const $scheduleItem = document.createElement('li');
-                $scheduleItem.innerText = `${schedule.departureCity}, ${schedule.departureStation} - ${schedule.arrivalCity}, ${schedule.arrivalStation}`;
+            Object.values(this._schedules).forEach((item, index) => {
+                const $scheduleItem = document.createElement('schedule-item');
+                $scheduleItem.nro = String(index).padStart(2,'0');
+
                 this.$currentDaySchedulesList.appendChild($scheduleItem);
             });
         }
