@@ -1,7 +1,7 @@
 const template = document.createElement('template');
 template.innerHTML = `
     <style>
-        li.schedule-item {
+        div.schedule-item {
             background: #fff;
             border-bottom: 1px solid #e0e2e7;
             position: relative;
@@ -26,8 +26,32 @@ template.innerHTML = `
             border-left: 1px solid #e0e2e7;
         }
 
+        span.nro {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #84888F;
+        }
+
+        span.pref {
+            position: absolute;
+            left: 32px;
+            top: 12px;
+            padding-left: 7px;
+        }
+
         span.pref:not(:empty) {
             border-left: 1px solid #DDE2E8;
+        }
+
+        .pref > span svg {
+            height: 14px;
+            position: relative;
+        }
+
+        span.pref > span.icon-mav svg {
+            height: 18px;
+            top: -1px;
         }
 
         span.time {
@@ -68,16 +92,47 @@ template.innerHTML = `
             bottom: 10px;
             left: 10px;
             cursor: pointer;
-            -webkit-transition: transform 0.3s;
-            -moz-transition: transform 0.3s;
             transition: transform 0.3s;
+        }
+
+        span.toggle::before {
+            content: "";
+            position: absolute;
+            top: 6px;
+            left: 9px;
+            z-index: 1;
+            transform: scale3d(1, 1, 1);
+            transition: transform 0.3s;
+            width: 0;
+            height: 0;
+            display: block;
+            border-left: 4px solid #F9F9FB;
+            border-top: 4px solid transparent;
+            border-right: 0;
+            border-bottom: 4px solid transparent;
+        }
+
+        .toggle::after {
+            content: "";
+            background: #0070FF;
+            z-index: 0;
+            border-radius: 100% 100% 100% 100%;
+            transform: scale3d(1, 1, 1);
+            transition: background 0.3s,transform 0.3s;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
         }
     </style>
 
-    <li class="schedule-item">
+    <div class="schedule-item">
         <div class="list-cell">
-            <span class="nro">01</span>
-                <span class="pref"><span class='icon-mav'>
+            <span class="nro"></span>
+            <span class="pref">
+                <span class='icon-mav'>
                     <svg width="15" height="26" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 15 26" enable-background="new 0 0 15 26" xml:space="preserve"><polygon id="XMLID_11_" fill="none" points="5,20.8 4.1,22.6 10.9,22.6 10,20.8"></polygon><polygon id="XMLID_10_" fill="none" points="10.2,3.2 7.5,1.4 4.8,3.2 7.4,4.9 7.6,4.9"></polygon><path fill="#0070FF" d="M14.8,11.1L14.8,11.1l0-0.7l-1.1-5.5H9.4L12,3.2l-4.5-3L3,3.2l2.5,1.7H1.2l-1.1,5.6v0.6V17l2.6,3.8l-2.5,4.9h2.3l0.7-1.3h8.6l0.7,1.3h2.3l-2.5-4.9l2.6-3.8V11.1z M7.5,12.9c0.9,0,1.7,0.7,1.7,1.7c0,0.9-0.7,1.7-1.7,1.7c-0.9,0-1.7-0.7-1.7-1.7C5.8,13.6,6.6,12.9,7.5,12.9z M4.8,3.2l2.7-1.8l2.7,1.8L7.6,4.9H7.4L4.8,3.2z M1.2,11.2l0-0.5l0.9-4.7H7v5.3H1.2z M4.1,22.6L5,20.8H10l0.9,1.8H4.1z M13.8,11.2H8V5.9h4.9l0.9,4.6V11.2z"></path><polygon id="XMLID_3_" fill="#FFFFFF" points="8,5.9 8,11.2 13.8,11.2 13.8,10.6 12.9,5.9"></polygon><polygon id="XMLID_2_" fill="#FFFFFF" points="7,5.9 2.1,5.9 1.2,10.7 1.2,11.2 7,11.2"></polygon><circle id="XMLID_1_" fill="#FFFFFF" cx="7.5" cy="14.6" r="1.7"></circle>
                     </svg>
                 </span>
@@ -119,7 +174,7 @@ template.innerHTML = `
             </div>
             <div class="travel_map_shortcut" data-tooltip="Megállók és térkép"></div>
         </div>
-    </li>
+    </div>
 `;
 
 
@@ -133,11 +188,14 @@ window.customElements.define(
             super();
             this._shadowRoot = this.attachShadow({ mode: 'open' });
             this._shadowRoot.appendChild(template.content.cloneNode(true));
+
+            this.$nro = this._shadowRoot.querySelector('span.nro');
         }
 
-        _renderCurrentDaySchedules() {
-            this.$currentDaySchedulesList.innerHTML = '';
-            // this.$currentDaySchedulesList.appendChild($scheduleItem);
+        connectedCallback() {
+            this.$nro.textContent = this.getAttribute('nro');
         }
+
+
     },
 );

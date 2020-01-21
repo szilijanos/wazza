@@ -7,7 +7,11 @@ template.innerHTML = `
         ul {
             padding-inline-start: 0;
         }
-    </style>
+
+        li {
+            list-style-type: none;
+        }
+        </style>
 
     <results-header></results-header>
 
@@ -33,10 +37,12 @@ window.customElements.define(
             this.$currentDaySchedulesList.innerHTML = '';
 
             Object.values(this._schedules).forEach((item, index) => {
+                const $li = document.createElement('li');
                 const $scheduleItem = document.createElement('schedule-item');
-                $scheduleItem.nro = String(index).padStart(2,'0');
+                $li.appendChild($scheduleItem)
+                $scheduleItem.setAttribute('nro', String(index + 1).padStart(2,'0'));
 
-                this.$currentDaySchedulesList.appendChild($scheduleItem);
+                this.$currentDaySchedulesList.appendChild($li);
             });
         }
 
