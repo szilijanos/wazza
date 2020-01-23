@@ -6,6 +6,8 @@ template.innerHTML = `
     <style>
         ul {
             padding-inline-start: 0;
+            margin-block-start:   0;
+            margin-block-end:     0;
         }
 
         li {
@@ -15,9 +17,7 @@ template.innerHTML = `
 
     <results-header></results-header>
 
-    <div id="results-list-body">
-        <ul></ul>
-    </div>
+    <div id="results-list-body"></div>
 `;
 
 window.customElements.define(
@@ -25,34 +25,33 @@ window.customElements.define(
     class extends HTMLElement {
         constructor() {
             super();
-            this._shadowRoot = this.attachShadow({ mode: 'open' });
-            this._shadowRoot.appendChild(template.content.cloneNode(true));
-
-            this.$currentDaySchedulesList = this._shadowRoot.querySelector(
-                '#results-list-body > ul',
-            );
+            this.root = this.attachShadow({ mode: 'open' });
+            this.root.appendChild(template.content.cloneNode(true));
         }
 
-        _renderCurrentDaySchedules() {
-            this.$currentDaySchedulesList.innerHTML = '';
+        connectedCallback() {
+            this.$currentDaySchedulesList = this.root.querySelector('#results-list-body');
+        }
 
-            Object.values(this._schedules).forEach((item, index) => {
+        render() {
+            this.$currentDaySchedulesList.innerHTML = '';
+            const $ul = document.createElement('ul');
+
+            Object.values(this.schedulesList).forEach((item, index) => {
                 const $li = document.createElement('li');
                 const $scheduleItem = document.createElement('schedule-item');
-                $li.appendChild($scheduleItem)
-                $scheduleItem.setAttribute('nro', String(index + 1).padStart(2,'0'));
+                $scheduleItem.item = { nro: index, ...item };
 
-                this.$currentDaySchedulesList.appendChild($li);
+                $li.appendChild($scheduleItem)
+                $ul.appendChild($li);
             });
+
+            this.$currentDaySchedulesList.appendChild($ul);
         }
 
         set schedules(schedules) {
-            this._schedules = schedules;
-            this._renderCurrentDaySchedules();
-        }
-
-        get schedules() {
-            return this._schedules;
+            this.schedulesList = Object.values(schedules);
+            this.render();
         }
     },
 );

@@ -126,10 +126,99 @@ template.innerHTML = `
             right: 0;
             margin: auto;
         }
+
+        .transfer {
+            color:
+            #84888F;
+            display: block;
+            position: absolute;
+            top: 10px;
+            left: 0;
+            right: 0;
+        }
+
+        .transferNr {
+            color:
+            #0070FF;
+        }
+
+        .vehicleDiv {
+            position: absolute;
+            top: 35px;
+            left: 0;
+            right: 0;
+        }
+
+        .vehicleBox {
+            display: inline-block;
+            height: 1.7em;
+            line-height: 1.7em;
+            color: #ffffff;
+            border-radius: 3px;
+            padding: 0px 3px 0px 3px;
+            margin: 0px 4px 0px 0px;
+        }
+
+        .vehicleBox.bus {
+            background-color: #FEAE46;
+            color: #000000;
+        }
+
+        .vehicleBox.local {
+            background-color:
+            #888888;
+        }
+
+        .vehicleBox.train {
+            background-color:
+            #0070FF;
+        }
+
+        .routemap {
+            height: 4px;
+            margin: auto;
+            position: absolute;
+            top: 70px;
+            bottom: auto;
+            left: 4px;
+            right: 4px;
+        }
+
+        .routemap::before {
+            left: -12px;
+            content: "";
+            width: 6px;
+            height: 6px;
+            border: 4px solid
+            #60646E;
+            position: absolute;
+            top: -5px;
+            border-radius: 100% 100% 100% 100%;
+        }
+
+        .routemap::after {
+            content: "";
+            right: -12px;
+            background: #60646E;
+            width: 6px;
+            height: 6px;
+            border: 4px solid  #60646E;
+            position: absolute;
+            top: -5px;
+        }
+
+        .traveldata {
+            color: #84888F;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 80px;
+            bottom: auto;
+        }
     </style>
 
     <div class="schedule-item">
-        <div class="list-cell">
+        <div id="departure" class="list-cell">
             <span class="nro"></span>
             <span class="pref">
                 <span class='icon-mav'>
@@ -137,16 +226,15 @@ template.innerHTML = `
                     </svg>
                 </span>
             </span>
-            <span class="time">15:27</span>
-            <span class="city">Pécs</span>
-            <span class="station">autóbusz-állomás</span>
+            <span class="time"></span>
+            <span class="city"></span>
+            <span class="station"></span>
             <span class="toggle" data-tooltip="Útvonal részletei..."></span>
         </div>
 
-        <div class="list-cell">
+        <div id="details" class="list-cell">
             <span class="transfer">
-            <span class="transferNr">1 átszállás</span>
-                | naponta
+                <span class="transferNr"></span>
             </span>
             <div class="vehicleDiv">
                 <div class="vehicleBox train">803</div>
@@ -163,9 +251,9 @@ template.innerHTML = `
             </span>
         </div>
 
-        <div class="list-cell">
-            <span class="time">19:57</span>
-            <span class="city">Zebegény vmh.</span>
+        <div id="arrival" class="list-cell">
+            <span class="time"></span>
+            <span class="city"></span>
             <span class="station"></span>
             <div class="right_corner_info">
                 <span class="icons">
@@ -178,24 +266,30 @@ template.innerHTML = `
 `;
 
 
-
-// $scheduleItem.innerText = `${schedule.departureCity}, ${schedule.departureStation} - ${schedule.arrivalCity}, $
-
 window.customElements.define(
     'schedule-item',
     class extends HTMLElement {
         constructor() {
             super();
-            this._shadowRoot = this.attachShadow({ mode: 'open' });
-            this._shadowRoot.appendChild(template.content.cloneNode(true));
-
-            this.$nro = this._shadowRoot.querySelector('span.nro');
+            this.root = this.attachShadow({ mode: 'open' });
+            this.root.appendChild(template.content.cloneNode(true));
         }
 
-        connectedCallback() {
-            this.$nro.textContent = this.getAttribute('nro');
+        render() {
+            this.root.querySelector('#departure > span.nro').textContent = String(this.itemData.nro + 1).padStart(2,'0');
+            this.root.querySelector('#departure > span.city').textContent = this.itemData.departureCity;
+            this.root.querySelector('#departure > span.station').textContent = this.itemData.departureStation;
+            this.root.querySelector('#departure > span.time').textContent = this.itemData.indulasi_ido;
+            this.root.querySelector('#arrival > span.city').textContent = this.itemData.arrivalCity;
+            this.root.querySelector('#arrival > span.station').textContent = this.itemData.arrivalStation;
+            this.root.querySelector('#arrival > span.time').textContent = this.itemData.erkezesi_ido;
+            this.root.querySelector('#details > span.transfer').innerHTML =
+                `<span class="transferNr">${this.itemData.atszallasok_szama} átszállás</span> | ${this.itemData.explanations.length === 1 ? this.itemData.explanations : 'lásd részletek...'}`;
         }
 
-
+        set item(value) {
+            this.itemData = value;
+            this.render();
+        }
     },
 );
