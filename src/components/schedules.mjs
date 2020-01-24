@@ -13,7 +13,7 @@ template.innerHTML = `
         li {
             list-style-type: none;
         }
-        </style>
+    </style>
 
     <results-header></results-header>
 

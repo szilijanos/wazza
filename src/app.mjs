@@ -38,7 +38,8 @@ export class App extends HTMLElement {
 
         // Importing temporary development mocks' - to be removed when app is capable to access live data
         (async () => {
-            const result = await import('../mockData/singleDaySchedules.js').then(
+            const result = await import('../mockData/Kkhalas_Budapest.js').then(
+            // const result = await import('../mockData/singleDaySchedules.js').then(
                 (module) => module.default,
             );
 

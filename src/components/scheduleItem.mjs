@@ -189,8 +189,7 @@ template.innerHTML = `
             content: "";
             width: 6px;
             height: 6px;
-            border: 4px solid
-            #60646E;
+            border: 4px solid #60646E;
             position: absolute;
             top: -5px;
             border-radius: 100% 100% 100% 100%;
@@ -202,9 +201,35 @@ template.innerHTML = `
             background: #60646E;
             width: 6px;
             height: 6px;
-            border: 4px solid  #60646E;
+            border: 4px solid #60646E;
             position: absolute;
             top: -5px;
+            border-radius: 100% 100% 100% 100%;
+        }
+
+        .routemap .line {
+            background:
+            #60646E;
+            float: left;
+            height: 4px;
+            position: relative;
+            -webkit-transition: background 0.3s;
+            -moz-transition: background 0.3s;
+            transition: background 0.3s;
+        }
+
+        .routemap .dot {
+            cursor: pointer;
+            width: 10px;
+            height: 10px;
+            background:
+            #0070FF;
+            top: -3px;
+            left: 50%;
+            z-index: 1;
+            position: absolute;
+            border-radius: 100% 100% 100% 100%;
+            transform: translateX(-50%);
         }
 
         .traveldata {
@@ -241,14 +266,8 @@ template.innerHTML = `
                 <div class="vehicleBox local">Helyi</div>
                 <div class="vehicleBox train">Z70</div>
             </div>
-            <div class="routemap">
-                <div class="dot" style="left:79.15194346289752%;" title="" data-tooltip="Budapest-Nyugati pu."></div>
-                <div class="line" style="width:79.15194346289752%;" data-class="grey"></div>
-                <div class="line" style="width:20.84805653710248%;" data-class="grey"></div>
-            </div>
-            <span class="traveldata">
-                283 km — 4 óra 30 perc
-            </span>
+            <div class="routemap"></div>
+            <span class="traveldata"></span>
         </div>
 
         <div id="arrival" class="list-cell">
@@ -283,8 +302,85 @@ window.customElements.define(
             this.root.querySelector('#arrival > span.city').textContent = this.itemData.arrivalCity;
             this.root.querySelector('#arrival > span.station').textContent = this.itemData.arrivalStation;
             this.root.querySelector('#arrival > span.time').textContent = this.itemData.erkezesi_ido;
+
             this.root.querySelector('#details > span.transfer').innerHTML =
-                `<span class="transferNr">${this.itemData.atszallasok_szama} átszállás</span> | ${this.itemData.explanations.length === 1 ? this.itemData.explanations : 'lásd részletek...'}`;
+            `<span class="transferNr">${this.itemData.atszallasok_szama} átszállás</span>${this.itemData.explanations.length > 0 && ' | lásd részletek...'}`;
+
+            const getVehicleBoxMarkup = (item) => {
+                const vehicles = [
+                    {
+                        type: 'bus',
+                        keyOfLineCode: '15'
+                    },
+                    {
+                        type: 'train',
+                        keyOfLineCode: '16'
+                    }
+                ];
+
+                const currentVehicle = vehicles[Number(item['11']) - 1];
+                const keyOfLineCode = item['38'].length > 0 ? '38' : currentVehicle.keyOfLineCode;
+
+                return `<div class="vehicleBox ${currentVehicle.type}">${item[keyOfLineCode]}</div>`
+            }
+
+            this.root.querySelector('#details > div.vehicleDiv').innerHTML =
+                Object.values(this.itemData.kifejtes_postjson.runs)
+                    .reduce((acc, item) => {
+                        if (item[56] === 'Vehicle') {
+                            return `${acc}
+                                    ${getVehicleBoxMarkup(item)}
+                                    <div class="vehicleBox local">Helyi</div>
+                                    `.trim()
+                        }
+
+                        return `${acc}${getVehicleBoxMarkup(item)}`
+                    },'');
+
+            this.root.querySelector('#details > div.routemap').innerHTML =
+                Object.values(this.itemData.jaratinfok)
+                    .reduce((acc, item, index, arr) => {
+                        if (arr.length === 1) {
+                            return {
+                                html: `<div class="line" style="width: 100%"></div>`
+                            };
+                        }
+
+                        if (index === 0) {
+                            const currentOffset = item.distance;
+                            const progressPercentage = currentOffset / this.itemData.totalDistance * 100;
+
+                            return {
+                                dotLeftOffset: currentOffset,
+                                lineWidth: currentOffset,
+                                html: ` <div class="line" style="width: ${progressPercentage}%"></div>
+                                        <div class="dot"  style="left:  ${progressPercentage}%"></div>
+                                        `.trim()
+                            };
+                        }
+
+                        if (index < arr.length - 1) {
+                            const currentOffset = acc.dotLeftOffset + item.distance;
+
+                            return {
+                                dotLeftOffset: currentOffset,
+                                lineWidth: item.distance,
+                                html: `${acc.html}
+                                    <div class="line" style="width: ${item.distance / this.itemData.totalDistance * 100}%"></div>
+                                    <div class="dot" style="left: ${currentOffset / this.itemData.totalDistance * 100}%"></div>
+                                    `.trim()
+                            };
+                        }
+
+                        return {
+                            html: `${acc.html}
+                                <div class="line" style="width : ${item.distance / this.itemData.totalDistance * 100}%"></div>
+                                `.trim()
+                        };
+                    },
+                    null).html;
+
+            this.root.querySelector('#details > span.traveldata').textContent = `${this.itemData.totalDistance.toFixed(1)} km — ${this.itemData.osszido.split(':').reduce((acc, time, index) => `${acc} ${ index === 0 ? Number(time) : time} ${['óra', 'perc'][index]}`, '')}`;
         }
 
         set item(value) {
