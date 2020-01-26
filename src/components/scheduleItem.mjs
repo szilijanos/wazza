@@ -258,6 +258,21 @@ template.innerHTML = `
         div.schedule-item + div.expanded-details.expanded {
             height: auto;
         }
+
+        .travel-steps {
+            padding: 30px 0 45px 0;
+        }
+
+        .travel-steps .step {
+            height: 130px;
+            position: relative;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .travel-steps .step.terminus {
+            height: 40px;
+        }
     </style>
 
     <div class="schedule-item">
@@ -295,7 +310,7 @@ template.innerHTML = `
         </div>
 
     </div>
-    <div class="expanded-details"></div>
+    <div class="expanded-details expanded"></div>
 `;
 
 
@@ -401,7 +416,19 @@ window.customElements.define(
                 $expandedDetails.classList.toggle('expanded', !haveDetailsExpandedClass)
             });
 
-            $expandedDetails.innerHTML = '<div>Recece!</div>';
+
+            const stepsMarkup = Object.values(this.itemData.kifejtes_postjson.runs)
+                .reduce((acc, item, index, arr) => {
+
+                    if (index === 0) {
+                        return `${acc}<div class="departure"><span>${mapperService.getDepartureTimeString(item)}</span><br>Indulás</div>`
+                    }
+
+                    return `${acc}<div class="arrival"><span>${mapperService.getDepartureTimeString(item)}</span></div>`
+                }, '');
+
+            $expandedDetails.innerHTML =
+                `<div class="travel-steps">${stepsMarkup}</div>`;
         }
 
         set item(value) {

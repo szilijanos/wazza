@@ -24,8 +24,7 @@ describe('App component', () => {
 
     it('should be styled', () => {
         Object.entries({
-            maxWidth: '800px',
-            minWidth: '600px',
+            width: '880px',
             margin: '0px auto',
             display: 'block',
             backgroundColor: 'rgb(56, 56, 66)', // #383842

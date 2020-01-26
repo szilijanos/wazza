@@ -6,8 +6,7 @@ const template = document.createElement('template');
 template.innerHTML = `
     <style>
         :host {
-            max-width: 800px;
-            min-width: 600px;
+            width: 880px;
             margin: 0 auto;
             display: block;
             background-color: #383842;
