@@ -1,3 +1,5 @@
+import mapperService from '../services/data-mapper-service.js'
+
 const template = document.createElement('template');
 template.innerHTML = `
     <style>
@@ -44,12 +46,21 @@ template.innerHTML = `
             border-left: 1px solid #DDE2E8;
         }
 
-        .pref > span svg {
+        span.pref > img svg {
             height: 14px;
             position: relative;
         }
 
-        span.pref > span.icon-mav svg {
+        span.pref > img {
+            margin-right: 3px;
+        }
+
+        span.pref > img.icon-train svg {
+            height: 18px;
+            top: -1px;
+        }
+
+        span.pref > img.icon-bus svg {
             height: 18px;
             top: -1px;
         }
@@ -213,8 +224,6 @@ template.innerHTML = `
             float: left;
             height: 4px;
             position: relative;
-            -webkit-transition: background 0.3s;
-            -moz-transition: background 0.3s;
             transition: background 0.3s;
         }
 
@@ -240,24 +249,28 @@ template.innerHTML = `
             top: 80px;
             bottom: auto;
         }
+
+        div.schedule-item + div.expanded-details {
+            height: 0;
+            transition: height 0.3s;
+        }
+
+        div.schedule-item + div.expanded-details.expanded {
+            height: auto;
+        }
     </style>
 
     <div class="schedule-item">
-        <div id="departure" class="list-cell">
+        <div class="departure list-cell">
             <span class="nro"></span>
-            <span class="pref">
-                <span class='icon-mav'>
-                    <svg width="15" height="26" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 15 26" enable-background="new 0 0 15 26" xml:space="preserve"><polygon id="XMLID_11_" fill="none" points="5,20.8 4.1,22.6 10.9,22.6 10,20.8"></polygon><polygon id="XMLID_10_" fill="none" points="10.2,3.2 7.5,1.4 4.8,3.2 7.4,4.9 7.6,4.9"></polygon><path fill="#0070FF" d="M14.8,11.1L14.8,11.1l0-0.7l-1.1-5.5H9.4L12,3.2l-4.5-3L3,3.2l2.5,1.7H1.2l-1.1,5.6v0.6V17l2.6,3.8l-2.5,4.9h2.3l0.7-1.3h8.6l0.7,1.3h2.3l-2.5-4.9l2.6-3.8V11.1z M7.5,12.9c0.9,0,1.7,0.7,1.7,1.7c0,0.9-0.7,1.7-1.7,1.7c-0.9,0-1.7-0.7-1.7-1.7C5.8,13.6,6.6,12.9,7.5,12.9z M4.8,3.2l2.7-1.8l2.7,1.8L7.6,4.9H7.4L4.8,3.2z M1.2,11.2l0-0.5l0.9-4.7H7v5.3H1.2z M4.1,22.6L5,20.8H10l0.9,1.8H4.1z M13.8,11.2H8V5.9h4.9l0.9,4.6V11.2z"></path><polygon id="XMLID_3_" fill="#FFFFFF" points="8,5.9 8,11.2 13.8,11.2 13.8,10.6 12.9,5.9"></polygon><polygon id="XMLID_2_" fill="#FFFFFF" points="7,5.9 2.1,5.9 1.2,10.7 1.2,11.2 7,11.2"></polygon><circle id="XMLID_1_" fill="#FFFFFF" cx="7.5" cy="14.6" r="1.7"></circle>
-                    </svg>
-                </span>
-            </span>
+            <span class="pref"></span>
             <span class="time"></span>
             <span class="city"></span>
             <span class="station"></span>
             <span class="toggle" data-tooltip="Útvonal részletei..."></span>
         </div>
 
-        <div id="details" class="list-cell">
+        <div class="short-details list-cell">
             <span class="transfer">
                 <span class="transferNr"></span>
             </span>
@@ -270,7 +283,7 @@ template.innerHTML = `
             <span class="traveldata"></span>
         </div>
 
-        <div id="arrival" class="list-cell">
+        <div class="arrival list-cell">
             <span class="time"></span>
             <span class="city"></span>
             <span class="station"></span>
@@ -279,9 +292,10 @@ template.innerHTML = `
                     <span class="icon_ic" data-tooltip="Intercity járat"></span>
                 </span>
             </div>
-            <div class="travel_map_shortcut" data-tooltip="Megállók és térkép"></div>
         </div>
+
     </div>
+    <div class="expanded-details"></div>
 `;
 
 
@@ -295,39 +309,36 @@ window.customElements.define(
         }
 
         render() {
-            this.root.querySelector('#departure > span.nro').textContent = String(this.itemData.nro + 1).padStart(2,'0');
-            this.root.querySelector('#departure > span.city').textContent = this.itemData.departureCity;
-            this.root.querySelector('#departure > span.station').textContent = this.itemData.departureStation;
-            this.root.querySelector('#departure > span.time').textContent = this.itemData.indulasi_ido;
-            this.root.querySelector('#arrival > span.city').textContent = this.itemData.arrivalCity;
-            this.root.querySelector('#arrival > span.station').textContent = this.itemData.arrivalStation;
-            this.root.querySelector('#arrival > span.time').textContent = this.itemData.erkezesi_ido;
-
-            this.root.querySelector('#details > span.transfer').innerHTML =
-            `<span class="transferNr">${this.itemData.atszallasok_szama} átszállás</span>${this.itemData.explanations.length > 0 && ' | lásd részletek...'}`;
-
-            const getVehicleBoxMarkup = (item) => {
-                const vehicles = [
-                    {
-                        type: 'bus',
-                        keyOfLineCode: '15'
-                    },
-                    {
-                        type: 'train',
-                        keyOfLineCode: '16'
-                    }
-                ];
-
-                const currentVehicle = vehicles[Number(item['11']) - 1];
-                const keyOfLineCode = item['38'].length > 0 ? '38' : currentVehicle.keyOfLineCode;
-
-                return `<div class="vehicleBox ${currentVehicle.type}">${item[keyOfLineCode]}</div>`
-            }
-
-            this.root.querySelector('#details > div.vehicleDiv').innerHTML =
+            this.root.querySelector('.departure > span.nro').textContent = String(this.itemData.nro + 1).padStart(2,'0');
+            this.root.querySelector('.departure > span.pref').innerHTML =
                 Object.values(this.itemData.kifejtes_postjson.runs)
                     .reduce((acc, item) => {
-                        if (item[56] === 'Vehicle') {
+                        const details = mapperService.getVehicleDetails(item);
+                        return `${acc}<img alt="${details.type}" class="icon-${details.type}" src="./assets/icons/icon-${details.type}.svg"  width="15" height="20">`
+                    }, '');
+
+            this.root.querySelector('.departure > span.city').textContent = this.itemData.departureCity;
+            this.root.querySelector('.departure > span.station').textContent = this.itemData.departureStation;
+            this.root.querySelector('.departure > span.time').textContent = this.itemData.indulasi_ido;
+            this.root.querySelector('.arrival > span.city').textContent = this.itemData.arrivalCity;
+            this.root.querySelector('.arrival > span.station').textContent = this.itemData.arrivalStation;
+            this.root.querySelector('.arrival > span.time').textContent = this.itemData.erkezesi_ido;
+
+            this.root.querySelector('.short-details > span.transfer').innerHTML =
+            `<span class="transferNr">${this.itemData.atszallasok_szama} átszállás</span> | ${/naponta|munkanapokon/.test(this.itemData.talalat_kozlekedik) ? this.itemData.talalat_kozlekedik : 'lásd részletek...'}`;
+
+            const getVehicleBoxMarkup = (item) => {
+                const currentVehicle = mapperService.getVehicleDetails(item);
+
+                return `<div class="vehicleBox ${currentVehicle.type}">
+                            ${currentVehicle.lineNumber}
+                        </div>`
+            }
+
+            this.root.querySelector('.short-details > div.vehicleDiv').innerHTML =
+                Object.values(this.itemData.kifejtes_postjson.runs)
+                    .reduce((acc, item) => {
+                        if (mapperService.isLocalTransportNecessaryAfter(item)) {
                             return `${acc}
                                     ${getVehicleBoxMarkup(item)}
                                     <div class="vehicleBox local">Helyi</div>
@@ -337,7 +348,7 @@ window.customElements.define(
                         return `${acc}${getVehicleBoxMarkup(item)}`
                     },'');
 
-            this.root.querySelector('#details > div.routemap').innerHTML =
+            this.root.querySelector('.short-details > div.routemap').innerHTML =
                 Object.values(this.itemData.jaratinfok)
                     .reduce((acc, item, index, arr) => {
                         if (arr.length === 1) {
@@ -380,7 +391,17 @@ window.customElements.define(
                     },
                     null).html;
 
-            this.root.querySelector('#details > span.traveldata').textContent = `${this.itemData.totalDistance.toFixed(1)} km — ${this.itemData.osszido.split(':').reduce((acc, time, index) => `${acc} ${ index === 0 ? Number(time) : time} ${['óra', 'perc'][index]}`, '')}`;
+            this.root.querySelector('.short-details > span.traveldata').textContent = `${this.itemData.totalDistance.toFixed(Number.isInteger(this.itemData.totalDistance) ? 0 : 1)} km — ${this.itemData.osszido.split(':').reduce((acc, time, index) => `${acc} ${ index === 0 ? Number(time) : time} ${['óra', 'perc'][index]}`, '')}`;
+
+            const $expandedDetails = this.root.querySelector('div.expanded-details');
+            const $scheduleItem = this.root.querySelector('div.schedule-item');
+
+            $scheduleItem.addEventListener('click', () => {
+                const haveDetailsExpandedClass = [...$expandedDetails.classList].some((cls) => cls === 'expanded');
+                $expandedDetails.classList.toggle('expanded', !haveDetailsExpandedClass)
+            });
+
+            $expandedDetails.innerHTML = '<div>Recece!</div>';
         }
 
         set item(value) {
