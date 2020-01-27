@@ -251,6 +251,8 @@ template.innerHTML = `
         }
 
         div.schedule-item + div.expanded-details {
+            background-color: rgb(242, 244, 246);
+            color: rgb(96, 100, 110);
             height: 0;
             transition: height 0.3s;
         }
@@ -265,9 +267,40 @@ template.innerHTML = `
 
         .travel-steps .step {
             height: 130px;
-            position: relative;
             display: flex;
             flex-direction: row;
+        }
+
+        .travel-steps .step > div {
+            position: relative;
+            flex: 1;
+        }
+
+        .travel-steps .step > div:first-child::before {
+            content: "";
+            width: 4px;
+            position: absolute;
+            top: 5;
+            bottom: 0;
+            right: -2px;
+            background: #60646E;
+            z-index: 1;
+        }
+
+        .travel-steps .step.station > div:first-child {
+            border-top: 1px solid #60646E;
+        }
+
+        .travel-steps .step > div .time {
+            color: #0070FF;
+            font-size: 15px;
+            text-align: right;
+            position: absolute;
+            top: -8px;
+            right: 0;
+            padding: 0 20px 0 10px;
+            background: #f2f4f6;
+            width: 55px;
         }
 
         .travel-steps .step.terminus {
@@ -417,15 +450,21 @@ window.customElements.define(
             });
 
 
+            const buildLeftDiv = (item, index) =>`
+                        <div>
+                            ${index === 0
+                                ? `<div class="time">
+                                        <strong>${mapperService.getDepartureTimeString(item)}</strong>
+                                        <br>Indulás
+                                    </div>`
+                                :   `<div class="time">
+                                        <strong>${mapperService.getDepartureTimeString(item)}</strong>
+                                    </div>`}
+                        </div>`;
+
+
             const stepsMarkup = Object.values(this.itemData.kifejtes_postjson.runs)
-                .reduce((acc, item, index, arr) => {
-
-                    if (index === 0) {
-                        return `${acc}<div class="departure"><span>${mapperService.getDepartureTimeString(item)}</span><br>Indulás</div>`
-                    }
-
-                    return `${acc}<div class="arrival"><span>${mapperService.getDepartureTimeString(item)}</span></div>`
-                }, '');
+                .reduce((acc, item, index) => `${acc}<div class="step">${buildLeftDiv(item, index)}</div>`, '');
 
             $expandedDetails.innerHTML =
                 `<div class="travel-steps">${stepsMarkup}</div>`;

@@ -21,25 +21,38 @@ const vehicles = [
     },
 ];
 
-const getVehicleDetails = item => ({
-    type: vehicles[item[map.vehicleType] - 1].type,
-    lineNumber:
-        item[map.lineName].length > 0
-            ? item[map.lineName]
-            : item[vehicles[item[map.vehicleType] - 1].keyOfLineCode],
-});
+function getVehicleDetails(item) {
+    return {
+        type: vehicles[item[map.vehicleType] - 1].type,
+        lineNumber:
+            item[map.lineName].length > 0
+                ? item[map.lineName]
+                : item[vehicles[item[map.vehicleType] - 1].keyOfLineCode],
+    };
+}
 
-const getDepartureTimeString = item => {
-    const hour = String(Math.floor(item[map.departureTime] / 60)).padStart(2, '0');
-    const min = String(Math.floor(item[map.departureTime] % 60)).padStart(2, '0');
+function getTimeString(item, mapKey) {
+    const hour = String(Math.floor(item[mapKey] / 60)).padStart(2, '0');
+    const min = String(Math.floor(item[mapKey] % 60)).padStart(2, '0');
 
     return `${hour}:${min}`;
-};
+}
 
-const isLocalTransportNecessaryAfter = item => item[map.interStationTransitMethod] === 'Vehicle';
+function getDepartureTimeString(item) {
+    return getTimeString(item, map.departureTime);
+}
+
+function getArrivalTimeString(item) {
+    return getTimeString(item, map.arrivalTime);
+}
+
+function isLocalTransportNecessaryAfter(item) {
+    return item[map.interStationTransitMethod] === 'Vehicle';
+}
 
 export default {
     getVehicleDetails,
+    getArrivalTimeString,
     getDepartureTimeString,
     isLocalTransportNecessaryAfter,
 };
