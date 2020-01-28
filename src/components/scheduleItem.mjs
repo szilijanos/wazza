@@ -2,313 +2,7 @@ import mapperService from '../services/data-mapper-service.js'
 
 const template = document.createElement('template');
 template.innerHTML = `
-    <style>
-        div.schedule-item {
-            background: #fff;
-            border-bottom: 1px solid #e0e2e7;
-            position: relative;
-            height: 110px;
-            transition: background-color 0.3s;
-            display: flex;
-            flex-direction: row;
-        }
-
-        div.list-cell {
-            color: #60646E;
-            font-size: 13px;
-            line-height: 20px;
-            border-right: 1px solid #e0e2e7;
-            padding: 10px;
-            position: relative;
-            flex: 1;
-            text-align: center;
-        }
-
-        div.list-cell:first-child {
-            border-left: 1px solid #e0e2e7;
-        }
-
-        span.nro {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: #84888F;
-        }
-
-        span.pref {
-            position: absolute;
-            left: 32px;
-            top: 12px;
-            padding-left: 7px;
-        }
-
-        span.pref:not(:empty) {
-            border-left: 1px solid #DDE2E8;
-        }
-
-        span.pref > img svg {
-            height: 14px;
-            position: relative;
-        }
-
-        span.pref > img {
-            margin-right: 3px;
-        }
-
-        span.pref > img.icon-train svg {
-            height: 18px;
-            top: -1px;
-        }
-
-        span.pref > img.icon-bus svg {
-            height: 18px;
-            top: -1px;
-        }
-
-        span.time {
-            color: #0070FF;
-            font-size: 21px;
-            display: block;
-            line-height: 40px;
-        }
-
-        span.city {
-            font-size: 15px;
-            font-weight: 600;
-            display: block;
-            line-height: 30px;
-            margin: 0 40px;
-            max-width: 250px;
-            display: block;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-
-        span.station {
-            font-size: 13px;
-            display: block;
-            margin: 0 40px;
-            max-width: 185px;
-            display: block;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-
-        span.toggle {
-            width: 20px;
-            height: 20px;
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-        span.toggle::before {
-            content: "";
-            position: absolute;
-            top: 6px;
-            left: 9px;
-            z-index: 1;
-            transform: scale3d(1, 1, 1);
-            transition: transform 0.3s;
-            width: 0;
-            height: 0;
-            display: block;
-            border-left: 4px solid #F9F9FB;
-            border-top: 4px solid transparent;
-            border-right: 0;
-            border-bottom: 4px solid transparent;
-        }
-
-        .toggle::after {
-            content: "";
-            background: #0070FF;
-            z-index: 0;
-            border-radius: 100% 100% 100% 100%;
-            transform: scale3d(1, 1, 1);
-            transition: background 0.3s,transform 0.3s;
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            margin: auto;
-        }
-
-        .transfer {
-            color:
-            #84888F;
-            display: block;
-            position: absolute;
-            top: 10px;
-            left: 0;
-            right: 0;
-        }
-
-        .transferNr {
-            color:
-            #0070FF;
-        }
-
-        .vehicleDiv {
-            position: absolute;
-            top: 35px;
-            left: 0;
-            right: 0;
-        }
-
-        .vehicleBox {
-            display: inline-block;
-            height: 1.7em;
-            line-height: 1.7em;
-            color: #ffffff;
-            border-radius: 3px;
-            padding: 0px 3px 0px 3px;
-            margin: 0px 4px 0px 0px;
-        }
-
-        .vehicleBox.bus {
-            background-color: #FEAE46;
-            color: #000000;
-        }
-
-        .vehicleBox.local {
-            background-color:
-            #888888;
-        }
-
-        .vehicleBox.train {
-            background-color:
-            #0070FF;
-        }
-
-        .routemap {
-            height: 4px;
-            margin: auto;
-            position: absolute;
-            top: 70px;
-            bottom: auto;
-            left: 4px;
-            right: 4px;
-        }
-
-        .routemap::before {
-            left: -12px;
-            content: "";
-            width: 6px;
-            height: 6px;
-            border: 4px solid #60646E;
-            position: absolute;
-            top: -5px;
-            border-radius: 100% 100% 100% 100%;
-        }
-
-        .routemap::after {
-            content: "";
-            right: -12px;
-            background: #60646E;
-            width: 6px;
-            height: 6px;
-            border: 4px solid #60646E;
-            position: absolute;
-            top: -5px;
-            border-radius: 100% 100% 100% 100%;
-        }
-
-        .routemap .line {
-            background:
-            #60646E;
-            float: left;
-            height: 4px;
-            position: relative;
-            transition: background 0.3s;
-        }
-
-        .routemap .dot {
-            cursor: pointer;
-            width: 10px;
-            height: 10px;
-            background:
-            #0070FF;
-            top: -3px;
-            left: 50%;
-            z-index: 1;
-            position: absolute;
-            border-radius: 100% 100% 100% 100%;
-            transform: translateX(-50%);
-        }
-
-        .traveldata {
-            color: #84888F;
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 80px;
-            bottom: auto;
-        }
-
-        div.schedule-item + div.expanded-details {
-            background-color: rgb(242, 244, 246);
-            color: rgb(96, 100, 110);
-            height: 0;
-            transition: height 0.3s;
-        }
-
-        div.schedule-item + div.expanded-details.expanded {
-            height: auto;
-        }
-
-        .travel-steps {
-            padding: 30px 0 45px 0;
-        }
-
-        .travel-steps .step {
-            height: 130px;
-            display: flex;
-            flex-direction: row;
-        }
-
-        .travel-steps .step > div {
-            position: relative;
-            flex: 1;
-        }
-
-        .travel-steps .step > div:first-child::before {
-            content: "";
-            width: 4px;
-            position: absolute;
-            top: 5;
-            bottom: 0;
-            right: -2px;
-            background: #60646E;
-            z-index: 1;
-        }
-
-        .travel-steps .step.station > div:first-child {
-            border-top: 1px solid #60646E;
-        }
-
-        .travel-steps .step > div .time {
-            color: #0070FF;
-            font-size: 15px;
-            text-align: right;
-            position: absolute;
-            top: -8px;
-            right: 0;
-            padding: 0 20px 0 10px;
-            background: #f2f4f6;
-            width: 55px;
-        }
-
-        .travel-steps .step.terminus {
-            height: 40px;
-        }
-    </style>
-
-    <div class="schedule-item">
+    <div part="schedule-item-container" class="schedule-item-container">
         <div class="departure list-cell">
             <span class="nro"></span>
             <span class="pref"></span>
@@ -354,6 +48,16 @@ window.customElements.define(
             super();
             this.root = this.attachShadow({ mode: 'open' });
             this.root.appendChild(template.content.cloneNode(true));
+        }
+
+        connectedCallback() {
+            fetch('./components/css/scheduleItemStyles.css')
+                .then(response => response.text())
+                .then(data => {
+                    const node = document.createElement('style');
+                    node.innerHTML = data;
+                    this.root.appendChild(node);
+                })
         }
 
         render() {
@@ -442,7 +146,7 @@ window.customElements.define(
             this.root.querySelector('.short-details > span.traveldata').textContent = `${this.itemData.totalDistance.toFixed(Number.isInteger(this.itemData.totalDistance) ? 0 : 1)} km — ${this.itemData.osszido.split(':').reduce((acc, time, index) => `${acc} ${ index === 0 ? Number(time) : time} ${['óra', 'perc'][index]}`, '')}`;
 
             const $expandedDetails = this.root.querySelector('div.expanded-details');
-            const $scheduleItem = this.root.querySelector('div.schedule-item');
+            const $scheduleItem = this.root.querySelector('.schedule-item-container');
 
             $scheduleItem.addEventListener('click', () => {
                 const haveDetailsExpandedClass = [...$expandedDetails.classList].some((cls) => cls === 'expanded');
@@ -451,16 +155,12 @@ window.customElements.define(
 
 
             const buildLeftDiv = (item, index) =>`
-                        <div>
-                            ${index === 0
-                                ? `<div class="time">
-                                        <strong>${mapperService.getDepartureTimeString(item)}</strong>
-                                        <br>Indulás
-                                    </div>`
-                                :   `<div class="time">
-                                        <strong>${mapperService.getDepartureTimeString(item)}</strong>
-                                    </div>`}
-                        </div>`;
+                <div>
+                    <div class="time">
+                        <strong>${mapperService.getDepartureTimeString(item)}</strong>
+                        ${index === 0 && '<br>Indulás'}
+                    </div>
+                </div>`;
 
 
             const stepsMarkup = Object.values(this.itemData.kifejtes_postjson.runs)
