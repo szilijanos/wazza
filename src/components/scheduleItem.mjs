@@ -51,12 +51,12 @@ window.customElements.define(
         }
 
         connectedCallback() {
-            fetch('./components/css/scheduleItemStyles.css')
+            fetch('./assets/css/scheduleItemStyles.css')
                 .then(response => response.text())
                 .then(data => {
-                    const node = document.createElement('style');
-                    node.innerHTML = data;
-                    this.root.appendChild(node);
+                    const styleNode = document.createElement('style');
+                    styleNode.innerHTML = data;
+                    this.root.appendChild(styleNode);
                 })
         }
 
