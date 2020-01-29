@@ -2,7 +2,13 @@ import mapperService from '../services/data-mapper-service.js'
 
 const template = document.createElement('template');
 template.innerHTML = `
-    <div part="schedule-item-container" class="schedule-item-container">
+    <style>
+        :host {
+            visibility: hidden;
+        }
+    </style>
+
+    <div class="schedule-item-container">
         <div class="departure list-cell">
             <span class="nro"></span>
             <span class="pref"></span>
@@ -57,6 +63,8 @@ window.customElements.define(
                     const styleNode = document.createElement('style');
                     styleNode.innerHTML = data;
                     this.root.appendChild(styleNode);
+
+                    this.root.host.style.visibility = 'visible';
                 })
         }
 
