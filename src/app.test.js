@@ -1,11 +1,10 @@
 import { fixture, expect } from '@open-wc/testing';
 
-import './app.mjs';
-
 describe('App component', () => {
     let element;
 
     beforeEach(async () => {
+        await import('./app.mjs');
         element = await fixture('<my-schedules-app></my-schedules-app>');
     });
 

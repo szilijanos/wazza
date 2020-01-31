@@ -1,6 +1,3 @@
-import './resultsHeader.mjs';
-import './scheduleItem.mjs';
-
 const template = document.createElement('template');
 template.innerHTML = `
     <style>
@@ -20,38 +17,47 @@ template.innerHTML = `
     <div id="results-list-body"></div>
 `;
 
-window.customElements.define(
-    'app-schedules',
-    class extends HTMLElement {
-        constructor() {
-            super();
-            this.root = this.attachShadow({ mode: 'open' });
-            this.root.appendChild(template.content.cloneNode(true));
+const defineComponent = () => {
+    window.customElements.define(
+        'app-schedules',
+        class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: 'open' });
+                this.root.appendChild(template.content.cloneNode(true));
+            }
+
+            connectedCallback() {
+                this.$currentDaySchedulesList = this.root.querySelector('#results-list-body');
+            }
+
+            render() {
+                this.$currentDaySchedulesList.innerHTML = '';
+                const $ul = document.createElement('ul');
+
+                Object.values(this.schedulesList).forEach((item, index) => {
+                    const $li = document.createElement('li');
+                    const $scheduleItem = document.createElement('schedule-item');
+                    $scheduleItem.item = { nro: index, ...item };
+
+                    $li.appendChild($scheduleItem)
+                    $ul.appendChild($li);
+                });
+
+                this.$currentDaySchedulesList.appendChild($ul);
+            }
+
+            set schedules(schedules) {
+                this.schedulesList = Object.values(schedules);
+                this.render();
+            }
         }
+    )
+};
 
-        connectedCallback() {
-            this.$currentDaySchedulesList = this.root.querySelector('#results-list-body');
-        }
-
-        render() {
-            this.$currentDaySchedulesList.innerHTML = '';
-            const $ul = document.createElement('ul');
-
-            Object.values(this.schedulesList).forEach((item, index) => {
-                const $li = document.createElement('li');
-                const $scheduleItem = document.createElement('schedule-item');
-                $scheduleItem.item = { nro: index, ...item };
-
-                $li.appendChild($scheduleItem)
-                $ul.appendChild($li);
-            });
-
-            this.$currentDaySchedulesList.appendChild($ul);
-        }
-
-        set schedules(schedules) {
-            this.schedulesList = Object.values(schedules);
-            this.render();
-        }
-    },
-);
+export const componentReadyPromise = Promise.all([
+    import('./resultsHeader.mjs'),
+    import('./scheduleItem.mjs')
+        .then((_module) => _module.componentReadyPromise)
+        .then(defineComponent)
+]);
