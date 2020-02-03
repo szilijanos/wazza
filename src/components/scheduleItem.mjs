@@ -149,21 +149,56 @@ const registerComponent = (dependencies) => {
                     $expandedDetails.classList.toggle('expanded', !haveDetailsExpandedClass)
                 });
 
+                const buildTransferLine = (item) => `
+                    <div class="left">
+                        <div class="time">
+                            <strong>${mapperService.getArrivalTimeString(item)}</strong>
+                        </div>
+                    </div>
+                    <div class="middle"></div>
+                    <div class="right"></div>
+                `;
 
-                const buildLeftDiv = (item, index) =>`
-                    <div>
+                const buildDepartureLine = (item, index) => `
+                    <div class="left">
                         <div class="time">
                             <strong>${mapperService.getDepartureTimeString(item)}</strong>
-                            ${index === 0 && '<br>Indulás'}
+                            ${index === 0 ? '<br>Indulás' : ''}
                         </div>
-                    </div>`;
+                    </div>
+                    <div class="middle"></div>
+                    <div class="right"></div>
+                `;
 
+                const buildTerminusLine = (item) => `
+                    <div class="left">
+                        <div class="time">
+                            <strong>${mapperService.getArrivalTimeString(item)}</strong>
+                            <br>Érkezés
+                        </div>
+                    </div>
+                    <div class="middle"></div>
+                    <div class="right"></div>
+                `;
 
                 const stepsMarkup = Object.values(this.itemData.kifejtes_postjson.runs)
-                    .reduce((acc, item, index) => `${acc}<div class="step">${buildLeftDiv(item, index)}</div>`, '');
+                    .reduce((acc, item, index, arr) => `
+                        ${acc}
 
-                $expandedDetails.innerHTML =
-                    `<div class="travel-steps">${stepsMarkup}</div>`;
+                        ${index === 0 ? `<div class="step departure-station">${buildDepartureLine(item, index)}</div>` : ''}
+
+                        ${(arr.length > 1 && index !== arr.length - 1)? `<div class="step transfer">${buildTransferLine(item, index)}</div>` : ''}
+
+                        <div class="step">${buildDepartureLine(item, index)}</div>
+
+                        ${(index === arr.length - 1)? `<div class="step terminus">${buildTerminusLine(item, index)}</div>` : ''}
+                        `,
+                    '');
+
+                $expandedDetails.innerHTML = `
+                    <div class="travel-steps">
+                        ${stepsMarkup}
+                    </div>`;
             }
 
             set item(value) {
