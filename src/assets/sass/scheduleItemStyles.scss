@@ -235,11 +235,10 @@
     & + div.expanded-details {
         background-color: rgb(242, 244, 246);
         color: rgb(96, 100, 110);
-        height: 0;
-        transition: height 0.3s;
+        display: none;
 
         &.expanded {
-            height: auto;
+            display: block;
         }
 
         & .travel-steps {
@@ -286,6 +285,14 @@
                         background: #f2f4f6;
                         border-radius: 50%;
                     }
+                }
+
+                & > div.middle {
+                    color: #60646E;
+                    font-weight: 600;
+                    font-size: 15px;
+                    margin: -8px 0 0 20px;
+
                 }
 
                 &.departure-station,

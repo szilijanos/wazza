@@ -57,23 +57,44 @@ const registerComponent = (dependencies) => {
             }
 
             render() {
-                this.root.querySelector('.departure > span.nro').textContent = String(this.itemData.nro + 1).padStart(2,'0');
-                this.root.querySelector('.departure > span.pref').innerHTML =
-                    Object.values(this.itemData.kifejtes_postjson.runs)
+                // TODO make a service that builds up a state from the raw data, and get data from there
+                const rawData = this.itemData.kifejtes_postjson.runs;
+                const lastIndex = Object.keys(rawData).length - 1;
+
+                const $ = (selector) => this.root.querySelector(selector);
+
+                $('.departure > span.nro').textContent = String(this.itemData.nro + 1).padStart(2,'0');
+                $('.departure > span.pref').innerHTML =
+                    Object.values(rawData)
                         .reduce((acc, item) => {
                             const details = mapperService.getVehicleDetails(item);
                             return `${acc}<img alt="${details.type}" class="icon-${details.type}" src="./assets/icons/icon-${details.type}.svg"  width="15" height="20">`
                         }, '');
 
-                this.root.querySelector('.departure > span.city').textContent = this.itemData.departureCity;
-                this.root.querySelector('.departure > span.station').textContent = this.itemData.departureStation;
-                this.root.querySelector('.departure > span.time').textContent = this.itemData.indulasi_ido;
-                this.root.querySelector('.arrival > span.city').textContent = this.itemData.arrivalCity;
-                this.root.querySelector('.arrival > span.station').textContent = this.itemData.arrivalStation;
-                this.root.querySelector('.arrival > span.time').textContent = this.itemData.erkezesi_ido;
+                $('.departure > span.city').textContent = mapperService.departure.getStationCity(rawData[0]);
+                $('.departure > span.station').textContent = mapperService.departure.getStationName(rawData[0]);
+                $('.departure > span.time').textContent = mapperService.departure.getTimeString(rawData[0]);
+                $('.arrival > span.city').textContent =  mapperService.arrival.getStationCity(rawData[lastIndex]);
+                $('.arrival > span.station').textContent =  mapperService.arrival.getStationName(rawData[lastIndex]);
+                $('.arrival > span.time').textContent = mapperService.arrival.getTimeString(rawData[lastIndex]);
 
-                this.root.querySelector('.short-details > span.transfer').innerHTML =
-                `<span class="transferNr">${this.itemData.atszallasok_szama} átszállás</span> | ${/naponta|munkanapokon/.test(this.itemData.talalat_kozlekedik) ? this.itemData.talalat_kozlekedik : 'lásd részletek...'}`;
+                const runDayInfo = () => Object.values(rawData).reduce(
+                    (acc, item, index) => {
+                        const current = mapperService.route.getDaysRunning(item);
+                        const regexDailyAndWorkdaysOnly = /naponta|munkanapokon/;
+
+                        if (regexDailyAndWorkdaysOnly.test(current) && (index === 0 || acc === current)) {
+                            return current;
+                        }
+
+                        return 'lásd részletek...';
+                    }, ''
+                );
+
+                $('.short-details > span.transfer').innerHTML = `
+                    <span class="transferNr">
+                        ${lastIndex} átszállás
+                    </span> | ${runDayInfo()}`;
 
                 const getVehicleBoxMarkup = (item) => {
                     const currentVehicle = mapperService.getVehicleDetails(item);
@@ -83,8 +104,8 @@ const registerComponent = (dependencies) => {
                             </div>`
                 }
 
-                this.root.querySelector('.short-details > div.vehicleDiv').innerHTML =
-                    Object.values(this.itemData.kifejtes_postjson.runs)
+                $('.short-details > div.vehicleDiv').innerHTML =
+                    Object.values(rawData)
                         .reduce((acc, item) => {
                             if (mapperService.isLocalTransportNecessaryAfter(item)) {
                                 return `${acc}
@@ -96,8 +117,9 @@ const registerComponent = (dependencies) => {
                             return `${acc}${getVehicleBoxMarkup(item)}`
                         },'');
 
-                this.root.querySelector('.short-details > div.routemap').innerHTML =
-                    Object.values(this.itemData.jaratinfok)
+                const totalDistance = mapperService.route.getTotalDistance(Object.values(rawData));
+                $('.short-details > div.routemap').innerHTML =
+                    Object.values(rawData)
                         .reduce((acc, item, index, arr) => {
                             if (arr.length === 1) {
                                 return {
@@ -105,44 +127,44 @@ const registerComponent = (dependencies) => {
                                 };
                             }
 
+                            const itemDistance = mapperService.route.getDistance(item);
+
                             if (index === 0) {
-                                const currentOffset = item.distance;
-                                const progressPercentage = currentOffset / this.itemData.totalDistance * 100;
+                                const currentOffset = itemDistance;
+                                const progressPercentage = currentOffset / totalDistance * 100;
 
                                 return {
                                     dotLeftOffset: currentOffset,
                                     lineWidth: currentOffset,
-                                    html: ` <div class="line" style="width: ${progressPercentage}%"></div>
-                                            <div class="dot"  style="left:  ${progressPercentage}%"></div>
-                                            `.trim()
+                                    html: `<div class="line" style="width: ${progressPercentage}%"></div>
+                                            <div class="dot"  style="left:  ${progressPercentage}%"></div>`
                                 };
                             }
 
                             if (index < arr.length - 1) {
-                                const currentOffset = acc.dotLeftOffset + item.distance;
+                                const currentOffset = acc.dotLeftOffset + itemDistance;
 
                                 return {
                                     dotLeftOffset: currentOffset,
-                                    lineWidth: item.distance,
+                                    lineWidth: itemDistance,
                                     html: `${acc.html}
-                                        <div class="line" style="width: ${item.distance / this.itemData.totalDistance * 100}%"></div>
-                                        <div class="dot" style="left: ${currentOffset / this.itemData.totalDistance * 100}%"></div>
-                                        `.trim()
+                                        <div class="line" style="width: ${itemDistance / totalDistance * 100}%"></div>
+                                        <div class="dot" style="left: ${currentOffset / totalDistance * 100}%"></div>`
                                 };
                             }
 
                             return {
                                 html: `${acc.html}
-                                    <div class="line" style="width : ${item.distance / this.itemData.totalDistance * 100}%"></div>
-                                    `.trim()
+                                        <div class="line" style="width : ${itemDistance / totalDistance * 100}%"></div>`
                             };
                         },
                         null).html;
 
-                this.root.querySelector('.short-details > span.traveldata').textContent = `${this.itemData.totalDistance.toFixed(Number.isInteger(this.itemData.totalDistance) ? 0 : 1)} km — ${this.itemData.osszido.split(':').reduce((acc, time, index) => `${acc} ${ index === 0 ? Number(time) : time} ${['óra', 'perc'][index]}`, '')}`;
+                $('.short-details > span.traveldata').textContent = `
+                    ${totalDistance.toFixed(Number.isInteger(totalDistance) ? 0 : 1)} km — ${mapperService.route.getTotalTimeString(Object.values(rawData)).split(':').reduce((acc, time, index) => `${acc} ${ index === 0 ? Number(time) : time} ${['óra', 'perc'][index]}`, '')}`;
 
-                const $expandedDetails = this.root.querySelector('div.expanded-details');
-                const $scheduleItem = this.root.querySelector('.schedule-item-container');
+                const $expandedDetails = $('div.expanded-details');
+                const $scheduleItem = $('.schedule-item-container');
 
                 $scheduleItem.addEventListener('click', () => {
                     const haveDetailsExpandedClass = [...$expandedDetails.classList].some((cls) => cls === 'expanded');
@@ -152,52 +174,68 @@ const registerComponent = (dependencies) => {
                 const buildTransferLine = (item) => `
                     <div class="left">
                         <div class="time">
-                            <strong>${mapperService.getArrivalTimeString(item)}</strong>
+                            <strong>${mapperService.arrival.getTimeString(item)}</strong>
                         </div>
                     </div>
-                    <div class="middle"></div>
+                    <div class="middle">
+                        <div class="step-details"></div>
+                    </div>
                     <div class="right"></div>
                 `;
 
                 const buildDepartureLine = (item, index) => `
                     <div class="left">
                         <div class="time">
-                            <strong>${mapperService.getDepartureTimeString(item)}</strong>
+                            <strong>${mapperService.departure.getTimeString(item)}</strong>
                             ${index === 0 ? '<br>Indulás' : ''}
                         </div>
                     </div>
-                    <div class="middle"></div>
+                    <div class="middle">
+                        <div class="step-details"></div>
+                    </div>
                     <div class="right"></div>
                 `;
 
                 const buildTerminusLine = (item) => `
                     <div class="left">
                         <div class="time">
-                            <strong>${mapperService.getArrivalTimeString(item)}</strong>
+                            <strong>${mapperService.arrival.getTimeString(item)}</strong>
                             <br>Érkezés
                         </div>
                     </div>
-                    <div class="middle"></div>
+                    <div class="middle">
+                        <div class="step-details"></div>
+                    </div>
                     <div class="right"></div>
                 `;
 
-                const stepsMarkup = Object.values(this.itemData.kifejtes_postjson.runs)
-                    .reduce((acc, item, index, arr) => {
-                        const isFirstStep = index === 0;
-                        const isLastStep = index === arr.length - 1;
-                        const isMultipleStepsTravel = arr.length > 1;
-                        const isInterimStep = isMultipleStepsTravel && !isLastStep;
+                const buildDetails = (acc, item, index, arr) => {
+                    const isFirstStep = index === 0;
+                    const isLastStep = index === arr.length - 1;
+                    const isOneBeforeLastStep = index === arr.length - 2;
+                    const isMultipleStepsTravel = arr.length > 1;
+                    const isInterimStep = isMultipleStepsTravel && !isLastStep;
 
-                        return `
-                            ${acc}
-                            ${isFirstStep ? `<div class="step departure-station">${buildDepartureLine(item, index)}</div>` : ''}
-                            ${(isFirstStep && isMultipleStepsTravel) ? `<div class="step transfer">${buildTransferLine(item, index)}</div>` : ''}
+                    return `
+                        ${acc}
+                        ${isFirstStep ? `<div class="step departure-station">${buildDepartureLine(item, index)}</div>` : ''}
+                        ${(isFirstStep && isMultipleStepsTravel) ? `<div class="step transfer">${buildTransferLine(item, index)}</div>` : ''}
 
-                            ${isInterimStep ? `<div class="step interim">${buildDepartureLine(arr[index + 1], index + 1)}</div>` : ''}
+                        ${isInterimStep ? `
+                                <div class="step interim">
+                                    ${buildDepartureLine(arr[index + 1], index + 1)}
+                                </div>
+                                ${isOneBeforeLastStep ? '' : `<div class="step transfer">
+                                    ${buildTransferLine(item, index)}
+                                </div>`}
+                            ` : ''}
 
-                            ${isLastStep ? `<div class="step terminus">${buildTerminusLine(item, index)}</div>` : ''}
-                        `},
-                    '');
+                        ${isLastStep ? `<div class="step terminus">${buildTerminusLine(item, index)}</div>` : ''}
+                    `;
+                }
+
+                const stepsMarkup = Object.values(rawData)
+                    .reduce((acc, item, index, arr) => buildDetails(acc, item, index, arr), '');
 
                 $expandedDetails.innerHTML = `
                     <div class="travel-steps">
