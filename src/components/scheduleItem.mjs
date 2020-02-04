@@ -182,17 +182,21 @@ const registerComponent = (dependencies) => {
                 `;
 
                 const stepsMarkup = Object.values(this.itemData.kifejtes_postjson.runs)
-                    .reduce((acc, item, index, arr) => `
-                        ${acc}
+                    .reduce((acc, item, index, arr) => {
+                        const isFirstStep = index === 0;
+                        const isLastStep = index === arr.length - 1;
+                        const isMultipleStepsTravel = arr.length > 1;
+                        const isInterimStep = isMultipleStepsTravel && !isLastStep;
 
-                        ${index === 0 ? `<div class="step departure-station">${buildDepartureLine(item, index)}</div>` : ''}
+                        return `
+                            ${acc}
+                            ${isFirstStep ? `<div class="step departure-station">${buildDepartureLine(item, index)}</div>` : ''}
+                            ${(isFirstStep && isMultipleStepsTravel) ? `<div class="step transfer">${buildTransferLine(item, index)}</div>` : ''}
 
-                        ${(arr.length > 1 && index !== arr.length - 1)? `<div class="step transfer">${buildTransferLine(item, index)}</div>` : ''}
+                            ${isInterimStep ? `<div class="step interim">${buildDepartureLine(arr[index + 1], index + 1)}</div>` : ''}
 
-                        <div class="step">${buildDepartureLine(item, index)}</div>
-
-                        ${(index === arr.length - 1)? `<div class="step terminus">${buildTerminusLine(item, index)}</div>` : ''}
-                        `,
+                            ${isLastStep ? `<div class="step terminus">${buildTerminusLine(item, index)}</div>` : ''}
+                        `},
                     '');
 
                 $expandedDetails.innerHTML = `
