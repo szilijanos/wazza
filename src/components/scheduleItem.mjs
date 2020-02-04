@@ -67,7 +67,7 @@ const registerComponent = (dependencies) => {
                 $('.departure > span.pref').innerHTML =
                     Object.values(rawData)
                         .reduce((acc, item) => {
-                            const details = mapperService.getVehicleDetails(item);
+                            const details = mapperService.route.getVehicleDetails(item);
                             return `${acc}<img alt="${details.type}" class="icon-${details.type}" src="./assets/icons/icon-${details.type}.svg"  width="15" height="20">`
                         }, '');
 
@@ -97,7 +97,7 @@ const registerComponent = (dependencies) => {
                     </span> | ${runDayInfo()}`;
 
                 const getVehicleBoxMarkup = (item) => {
-                    const currentVehicle = mapperService.getVehicleDetails(item);
+                    const currentVehicle = mapperService.route.getVehicleDetails(item);
 
                     return `<div class="vehicleBox ${currentVehicle.type}">
                                 ${currentVehicle.lineNumber}
@@ -107,7 +107,7 @@ const registerComponent = (dependencies) => {
                 $('.short-details > div.vehicleDiv').innerHTML =
                     Object.values(rawData)
                         .reduce((acc, item) => {
-                            if (mapperService.isLocalTransportNecessaryAfter(item)) {
+                            if (mapperService.route.isLocalTransportNecessaryAfter(item)) {
                                 return `${acc}
                                         ${getVehicleBoxMarkup(item)}
                                         <div class="vehicleBox local">Helyi</div>
@@ -171,18 +171,6 @@ const registerComponent = (dependencies) => {
                     $expandedDetails.classList.toggle('expanded', !haveDetailsExpandedClass)
                 });
 
-                const buildTransferLine = (item) => `
-                    <div class="left">
-                        <div class="time">
-                            <strong>${mapperService.arrival.getTimeString(item)}</strong>
-                        </div>
-                    </div>
-                    <div class="middle">
-                        <div class="step-details"></div>
-                    </div>
-                    <div class="right"></div>
-                `;
-
                 const buildDepartureLine = (item, index) => `
                     <div class="left">
                         <div class="time">
@@ -191,7 +179,25 @@ const registerComponent = (dependencies) => {
                         </div>
                     </div>
                     <div class="middle">
-                        <div class="step-details"></div>
+                        <div class="step-details">
+                            <div>${mapperService.departure.getStationCity(item)}</div>
+                            <div class="station">${mapperService.departure.getStationName(item)}</div>
+                        </div>
+                    </div>
+                    <div class="right"></div>
+                `;
+
+                const buildTransferLine = (item) => `
+                    <div class="left">
+                        <div class="time">
+                            <strong>${mapperService.arrival.getTimeString(item)}</strong>
+                        </div>
+                    </div>
+                    <div class="middle">
+                        <div class="step-details">
+                            <div>${mapperService.arrival.getStationCity(item)}</div>
+                            <div class="station">${mapperService.arrival.getStationName(item)}</div>
+                        </div>
                     </div>
                     <div class="right"></div>
                 `;
@@ -204,7 +210,10 @@ const registerComponent = (dependencies) => {
                         </div>
                     </div>
                     <div class="middle">
-                        <div class="step-details"></div>
+                        <div class="step-details">
+                            <div>${mapperService.arrival.getStationCity(item)}</div>
+                            <div class="station">${mapperService.arrival.getStationName(item)}</div>
+                        </div>
                     </div>
                     <div class="right"></div>
                 `;

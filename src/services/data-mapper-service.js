@@ -64,8 +64,8 @@ const departure = {
 
 const arrival = {
     getTimeString: item => getTimeStringFromMinutes(item[map.arrivalTime]),
-    getStationName: item => getStationName(item, map.departureStation),
-    getStationCity: item => getStationCity(item, map.departureStation),
+    getStationName: item => getStationName(item, map.arrivalStation),
+    getStationCity: item => getStationCity(item, map.arrivalStation),
 };
 
 const route = {
@@ -78,12 +78,12 @@ const route = {
             routeItemArray[routeItemArray.length - 1][map.arrivalTime] -
                 routeItemArray[0][map.departureTime],
         ),
+    getVehicleDetails,
+    isLocalTransportNecessaryAfter,
 };
 
 export default {
     arrival,
     departure,
     route,
-    getVehicleDetails,
-    isLocalTransportNecessaryAfter,
 };

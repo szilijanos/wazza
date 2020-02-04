@@ -293,6 +293,11 @@
                     font-size: 15px;
                     margin: -8px 0 0 20px;
 
+                    & .station {
+                        font-weight: 400;
+                        font-size: 13px;
+                    }
+
                 }
 
                 &.departure-station,
