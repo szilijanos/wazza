@@ -23,6 +23,10 @@ const vehicles = [
         type: 'train',
         keyOfLineCode: map.trainLineCode,
     },
+    {
+        type: 'ship',
+        keyOfLineCode: map.trainLineCode,
+    },
 ];
 
 function getVehicleDetails(item) {
@@ -73,6 +77,7 @@ const route = {
     getDistance: item => Number(item[map.distance] / 1000),
     getTotalDistance: routeItemArray =>
         routeItemArray.reduce((acc, item) => acc + Number(item[map.distance] / 1000), 0),
+    getDurationInMinutes: item => item[map.arrivalTime] - item[map.departureTime],
     getTotalTimeString: routeItemArray =>
         getTimeStringFromMinutes(
             routeItemArray[routeItemArray.length - 1][map.arrivalTime] -

@@ -39,7 +39,7 @@ const registerComponent = () => {
 
                 // Importing temporary development mocks' - to be removed when app is capable to access live data
                 (async () => {
-                    const result = await import('../mockData/Kkhalas_Budapest.js').then(
+                    const result = await import('../mockData/Tihany_Dombovar.js').then(
                         (module) => module.default,
                     );
 

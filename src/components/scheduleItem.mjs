@@ -38,8 +38,7 @@ template.innerHTML = `
 
     </div>
 
-    <!-- TODO the expanded class should be removed, once styling is done -->
-    <div class="expanded-details expanded"></div>
+    <div class="expanded-details"></div>
 `;
 
 const registerComponent = (dependencies) => {
@@ -179,9 +178,17 @@ const registerComponent = (dependencies) => {
                         </div>
                     </div>
                     <div class="middle">
-                        <div class="step-details">
-                            <div>${mapperService.departure.getStationCity(item)}</div>
-                            <div class="station">${mapperService.departure.getStationName(item)}</div>
+                        <div class="city">${mapperService.departure.getStationCity(item)}</div>
+                        <div class="station">${mapperService.departure.getStationName(item)}</div>
+                        <div class="step-info">
+                            <div class="duration">
+                                ${mapperService.route.getDistance(item)} km
+                                <br>
+                                ${mapperService.route.getDurationInMinutes(item)} perc
+                            </div>
+                            <div></div>
+                            <div class="cl"></div>
+                            <div class="operator"></div>
                         </div>
                     </div>
                     <div class="right"></div>
@@ -195,8 +202,12 @@ const registerComponent = (dependencies) => {
                     </div>
                     <div class="middle">
                         <div class="step-details">
-                            <div>${mapperService.arrival.getStationCity(item)}</div>
-                            <div class="station">${mapperService.arrival.getStationName(item)}</div>
+                            <div class="city">
+                                ${mapperService.arrival.getStationCity(item)}
+                            </div>
+                            <div class="station">
+                                ${mapperService.arrival.getStationName(item)}
+                            </div>
                         </div>
                     </div>
                     <div class="right"></div>
@@ -211,8 +222,12 @@ const registerComponent = (dependencies) => {
                     </div>
                     <div class="middle">
                         <div class="step-details">
-                            <div>${mapperService.arrival.getStationCity(item)}</div>
-                            <div class="station">${mapperService.arrival.getStationName(item)}</div>
+                            <div class="city">
+                                ${mapperService.arrival.getStationCity(item)}
+                            </div>
+                            <div class="station">
+                                ${mapperService.arrival.getStationName(item)}
+                            </div>
                         </div>
                     </div>
                     <div class="right"></div>
