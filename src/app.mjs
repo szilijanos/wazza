@@ -1,6 +1,7 @@
 import './components/header.js';
 import './components/footer.js';
 import './components/schedules.mjs';
+import './components/pages/searchPage.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -18,6 +19,8 @@ template.innerHTML = `
     <app-header></app-header>
 
     <main>
+        <!-- temporary placement of both pages until developed -->
+        <search-page></search-page>
         <app-schedules></app-schedules>
     </main>
 
@@ -44,7 +47,6 @@ const registerComponent = () => {
                     );
 
                     this.$schedules = $currentDaySchedulesList;
-
                     this.$schedules.schedules = result.results.talalatok;
 
                     window.requestAnimationFrame(() => {
@@ -62,6 +64,7 @@ const init = async () => {
             customElements.whenDefined('app-header'),
             customElements.whenDefined('app-footer'),
             customElements.whenDefined('app-schedules'),
+            customElements.whenDefined('search-page'),
         ]);
 
         registerComponent();

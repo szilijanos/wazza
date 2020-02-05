@@ -167,7 +167,10 @@ const registerComponent = (dependencies) => {
 
                 $scheduleItem.addEventListener('click', () => {
                     const haveDetailsExpandedClass = [...$expandedDetails.classList].some((cls) => cls === 'expanded');
-                    $expandedDetails.classList.toggle('expanded', !haveDetailsExpandedClass)
+
+                    window.requestAnimationFrame(() => {
+                        $expandedDetails.classList.toggle('expanded', !haveDetailsExpandedClass)
+                    });
                 });
 
                 const buildDepartureLine = (item, index) => `

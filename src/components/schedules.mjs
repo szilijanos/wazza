@@ -21,7 +21,6 @@ template.innerHTML = `
 `;
 
 const registerComponent = () => {
-
     window.customElements.define(
         'app-schedules',
         class extends HTMLElement {
