@@ -59,6 +59,17 @@ const registerComponent = () => {
 };
 
 const init = async () => {
+    if ('serviceWorker' in navigator) {
+        await navigator.serviceWorker.register('/src/service-worker.js')
+            .then((registration) => {
+                console.log('Registration successful, scope is:', registration.scope);
+            })
+            .catch((error) => {
+                // TODO use this to notify the users the limitations this implies
+                console.log('Service worker registration failed, error:', error);
+            });
+    }
+
     if (!window.customElements.get('my-schedules-app')){
         await Promise.all([
             customElements.whenDefined('app-header'),
