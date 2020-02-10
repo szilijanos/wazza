@@ -1,6 +1,6 @@
 import { fixture, expect } from '@open-wc/testing';
 
-import './schedules.mjs';
+import './schedules.js';
 
 describe('Schedules component', () => {
     let element;

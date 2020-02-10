@@ -1,6 +1,6 @@
 import { fixture, expect } from '@open-wc/testing';
 
-import './resultsHeader.mjs';
+import './resultsHeader.js';
 
 describe('Results header component', () => {
     let rootElement;

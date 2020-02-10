@@ -1,5 +1,5 @@
-import './resultsHeader.mjs';
-import './scheduleItem.mjs';
+import './resultsHeader.js';
+import './scheduleItem.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -43,7 +43,7 @@ const registerComponent = () => {
                     const $scheduleItem = document.createElement('schedule-item');
                     $scheduleItem.item = { nro: index, ...item };
 
-                    $li.appendChild($scheduleItem)
+                    $li.appendChild($scheduleItem);
                     $ul.appendChild($li);
                 });
 
@@ -54,7 +54,7 @@ const registerComponent = () => {
                 this.schedulesList = Object.values(_schedules);
                 this.render();
             }
-        }
+        },
     );
 };
 
@@ -67,6 +67,6 @@ const init = async () => {
 
         registerComponent();
     }
-}
+};
 
 init();

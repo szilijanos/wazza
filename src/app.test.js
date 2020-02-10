@@ -4,7 +4,7 @@ describe('App component', () => {
     let element;
 
     beforeEach(async () => {
-        await import('./app.mjs');
+        await import('./app.js');
         element = await fixture('<my-schedules-app></my-schedules-app>');
     });
 
