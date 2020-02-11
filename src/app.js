@@ -68,7 +68,7 @@ const init = async () => {
         return;
     }
 
-    navigator.serviceWorker
+    await navigator.serviceWorker
         .register('/src/service-worker.js')
         .then(registration => {
             console.log('Registration successful, scope is:', registration.scope);
