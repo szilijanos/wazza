@@ -19,7 +19,8 @@ const staticFilesToCache = [
     'components/pages/schedules/schedulesPage.js',
     'components/pages/search/searchPage.js',
     'services/dataMapperService.js',
-    'mockData/Tihany_Dombovar.js', // this is not static, and shall be removed, once dínamic caching works
+    'services/searchFormService.js',
+    'mockData/Tihany_Dombovar.js', // this is not static, and shall be removed, once dynamic caching works
 ];
 
 const staticCacheVersion = 'v1.0';
