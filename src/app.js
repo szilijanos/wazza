@@ -1,7 +1,7 @@
-import './components/header.js';
-import './components/footer.js';
-import './components/schedules.js';
-import './components/pages/searchPage.js';
+import './components/common/header.js';
+import './components/common/footer.js';
+import './components/pages/schedules/schedulesPage.js';
+import './components/pages/search/searchPage.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -20,8 +20,8 @@ template.innerHTML = `
 
     <main>
         <!-- temporary placement of both pages until developed -->
-        <!-- <search-page></search-page> -->
-        <app-schedules></app-schedules>
+        <search-page></search-page>
+        <schedules-page></schedules-page>
     </main>
 
     <app-footer></app-footer>
@@ -39,7 +39,7 @@ const registerComponent = () => {
             }
 
             connectedCallback() {
-                const $currentDaySchedulesList = this.root.querySelector('app-schedules');
+                const $currentDaySchedulesList = this.root.querySelector('schedules-page');
 
                 // Importing temporary development mocks' - to be removed when app is capable to access live data
                 (async () => {
@@ -82,7 +82,7 @@ const init = async () => {
         await Promise.all([
             customElements.whenDefined('app-header'),
             customElements.whenDefined('app-footer'),
-            customElements.whenDefined('app-schedules'),
+            customElements.whenDefined('schedules-page'),
             customElements.whenDefined('search-page'),
         ]);
 

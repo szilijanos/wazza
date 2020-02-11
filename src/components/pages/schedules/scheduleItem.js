@@ -1,4 +1,4 @@
-import mapperService from '../services/dataMapperService.js';
+import mapperService from '../../../services/dataMapperService.js';
 
 const template = document.createElement('template');
 template.innerHTML = `

@@ -12,12 +12,12 @@ const staticFilesToCache = [
     'assets/icons/icon-bus.svg',
     'assets/icons/icon-ship.svg',
     'assets/icons/icon-train.svg',
-    'components/footer.js',
-    'components/header.js',
-    'components/resultsHeader.js',
-    'components/scheduleItem.js',
-    'components/schedules.js',
-    'components/pages/searchPage.js',
+    'components/common/footer.js',
+    'components/common/header.js',
+    'components/pages/schedules/resultsHeader.js',
+    'components/pages/schedules/scheduleItem.js',
+    'components/pages/schedules/schedulesPage.js',
+    'components/pages/search/searchPage.js',
     'services/dataMapperService.js',
     'mockData/Tihany_Dombovar.js', // this is not static, and shall be removed, once dínamic caching works
 ];

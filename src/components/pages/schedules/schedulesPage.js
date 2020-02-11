@@ -22,7 +22,7 @@ template.innerHTML = `
 
 const registerComponent = () => {
     window.customElements.define(
-        'app-schedules',
+        'schedules-page',
         class extends HTMLElement {
             constructor() {
                 super();
@@ -59,7 +59,7 @@ const registerComponent = () => {
 };
 
 const init = async () => {
-    if (!window.customElements.get('app-schedules')) {
+    if (!window.customElements.get('schedules-page')) {
         await Promise.all([
             customElements.whenDefined('results-header'),
             customElements.whenDefined('schedule-item'),
