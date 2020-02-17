@@ -1,7 +1,8 @@
+#IDE
+.vscode
+
 #npm
-nodemodules
 node_modules
 
 #generated files
-coverage
 src/assets/css

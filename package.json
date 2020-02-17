@@ -66,5 +66,7 @@
             "git add"
         ]
     },
-    "dependencies": {}
+    "dependencies": {
+        "follow-redirects": "^1.10.0"
+    }
 }

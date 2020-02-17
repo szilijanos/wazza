@@ -9,6 +9,7 @@ const staticFilesToCache = [
     'index.html',
     'global.css',
     'assets/css/scheduleItemStyles.css',
+    'assets/icons/favicon.ico',
     'assets/icons/icon-bus.svg',
     'assets/icons/icon-ship.svg',
     'assets/icons/icon-train.svg',
