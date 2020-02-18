@@ -125,9 +125,9 @@ const registerComponent = dependencies => {
                     (acc, item) => {
                         if (mapperService.route.isLocalTransportNecessaryAfter(item)) {
                             return `${acc}
-                                        ${getVehicleBoxMarkup(item)}
-                                        <div class="vehicleBox local">Helyi</div>
-                                        `.trim();
+                                    ${getVehicleBoxMarkup(item)}
+                                    <div class="vehicleBox local">Helyi</div>
+                                    `.trim();
                         }
 
                         return `${acc}${getVehicleBoxMarkup(item)}`;
@@ -153,8 +153,9 @@ const registerComponent = dependencies => {
                             return {
                                 dotLeftOffset: currentOffset,
                                 lineWidth: currentOffset,
-                                html: `<div class="line" style="width: ${progressPercentage}%"></div>
-                                            <div class="dot"  style="left:  ${progressPercentage}%"></div>`,
+                                html: `
+                                    <div class="line" style="width: ${progressPercentage}%"></div>
+                                    <div class="dot"  style="left:  ${progressPercentage}%"></div>`,
                             };
                         }
 
@@ -184,17 +185,23 @@ const registerComponent = dependencies => {
                     null,
                 ).html;
 
-                $('.short-details > span.traveldata').textContent = `
-                    ${totalDistance.toFixed(
-                        Number.isInteger(totalDistance) ? 0 : 1,
-                    )} km — ${mapperService.route
-                    .getTotalTimeString(Object.values(rawData))
-                    .split(':')
-                    .reduce(
-                        (acc, time, index) =>
-                            `${acc} ${index === 0 ? Number(time) : time} ${['óra', 'perc'][index]}`,
-                        '',
-                    )}`;
+                const getTravelSummaryData = () => {
+                    const km = totalDistance.toFixed(Number.isInteger(totalDistance) ? 0 : 1);
+                    const duration = mapperService.route
+                        .getTotalTimeString(Object.values(rawData))
+                        .split(':')
+                        .reduce(
+                            (acc, time, index) =>
+                                `${acc} ${index === 0 ? Number(time) : time} ${
+                                    ['óra', 'perc'][index]
+                                }`,
+                            '',
+                        );
+
+                    return `${km} km — ${duration}`;
+                };
+
+                $('.short-details > span.traveldata').textContent = getTravelSummaryData();
 
                 const $expandedDetails = $('div.expanded-details');
                 const $scheduleItem = $('.schedule-item-container');
@@ -307,11 +314,11 @@ const registerComponent = dependencies => {
                                 ${
                                     isOneBeforeLastStep
                                         ? ''
-                                        : `<div class="step transfer">
-                                    ${buildTransferLine(item, index)}
-                                </div>`
-                                }
-                            `
+                                        : `<div class="step transfer">${buildTransferLine(
+                                              item,
+                                              index,
+                                          )}</div>`
+                                }`
                                 : ''
                         }
 
