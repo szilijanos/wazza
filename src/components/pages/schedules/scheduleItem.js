@@ -288,48 +288,17 @@ const registerComponent = dependencies => {
 
                     return `
                         ${acc}
-                        ${
-                            isFirstStep
-                                ? `<div class="step departure-station">${buildDepartureLine(
-                                      item,
-                                      index,
-                                  )}</div>`
-                                : ''
-                        }
-                        ${
-                            isFirstStep && isMultipleStepsTravel
-                                ? `<div class="step transfer">${buildTransferLine(
-                                      item,
-                                      index,
-                                  )}</div>`
-                                : ''
-                        }
+                        ${isFirstStep ? `<div class="step departure-station">${buildDepartureLine(item, index)}</div>` : ''}
+                        ${isFirstStep && isMultipleStepsTravel ? `<div class="step transfer">${buildTransferLine(item, index)}</div>` : ''}
 
-                        ${
-                            isInterimStep
-                                ? `
-                                <div class="step interim">
-                                    ${buildDepartureLine(arr[index + 1], index + 1)}
-                                </div>
-                                ${
-                                    isOneBeforeLastStep
-                                        ? ''
-                                        : `<div class="step transfer">${buildTransferLine(
-                                              item,
-                                              index,
-                                          )}</div>`
-                                }`
-                                : ''
-                        }
+                        ${isInterimStep ? `
+                            <div class="step interim">
+                                ${buildDepartureLine(arr[index + 1], index + 1)}
+                            </div>
+                            ${isOneBeforeLastStep ? '' : `<div class="step transfer">${buildTransferLine(item, index)}</div>`}
+                        ` : ''}
 
-                        ${
-                            isLastStep
-                                ? `<div class="step terminus">${buildTerminusLine(
-                                      item,
-                                      index,
-                                  )}</div>`
-                                : ''
-                        }
+                        ${isLastStep ? `<div class="step terminus">${buildTerminusLine(item, index)}</div>` : ''}
                     `;
                 };
 
