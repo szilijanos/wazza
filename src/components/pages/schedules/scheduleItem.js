@@ -1,8 +1,10 @@
 import mapperService from '../../../services/dataMapperService.js';
+import './scheduleItemDetails.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
     <div class="schedule-item-container">
+
         <div class="departure list-cell">
             <span class="nro"></span>
             <span class="pref"></span>
@@ -38,7 +40,7 @@ template.innerHTML = `
 
     </div>
 
-    <div class="expanded-details"></div>
+    <schedule-item-details></schedule-item-details>
 `;
 
 const registerComponent = dependencies => {
@@ -52,7 +54,28 @@ const registerComponent = dependencies => {
 
                 const styleNode = document.createElement('style');
                 styleNode.innerHTML = dependencies.style;
-                this.root.appendChild(styleNode);
+                this.root.prepend(styleNode);
+
+                this.$details = this.root.querySelector('schedule-item-details');
+                this.$scheduleItem = this.root.querySelector('.schedule-item-container');
+
+                this.expandDetails = () => {
+                    const haveDetailsExpandedClass = [...this.$details.classList].some(
+                        className => className === 'expanded',
+                    );
+
+                    window.requestAnimationFrame(() => {
+                        this.$details.classList.toggle('expanded', !haveDetailsExpandedClass);
+                    });
+                };
+            }
+
+            connectedCallback() {
+                this.$scheduleItem.addEventListener('click', this.expandDetails);
+            }
+
+            disconnectedCallback() {
+                this.$scheduleItem.removeEventListener('click', this.expandDetails);
             }
 
             render() {
@@ -60,7 +83,7 @@ const registerComponent = dependencies => {
                 const rawData = this.itemData.kifejtes_postjson.runs;
                 const lastIndex = Object.keys(rawData).length - 1;
 
-                const $ = selector => this.root.querySelector(selector);
+                const $ = selector => this.root.querySelector(selector); // TODO: move this into utils
 
                 $('.departure > span.nro').textContent = String(this.itemData.nro + 1).padStart(
                     2,
@@ -176,10 +199,9 @@ const registerComponent = dependencies => {
                         }
 
                         return {
-                            html: `${acc.html}
-                                        <div class="line" style="width : ${(itemDistance /
-                                            totalDistance) *
-                                            100}%"></div>`,
+                            html: `${acc.html}<div class="line" style="width : ${(itemDistance /
+                                totalDistance) *
+                                100}%"></div>`,
                         };
                     },
                     null,
@@ -202,120 +224,12 @@ const registerComponent = dependencies => {
                 };
 
                 $('.short-details > span.traveldata').textContent = getTravelSummaryData();
-
-                const $expandedDetails = $('div.expanded-details');
-                const $scheduleItem = $('.schedule-item-container');
-
-                $scheduleItem.addEventListener('click', () => {
-                    const haveDetailsExpandedClass = [...$expandedDetails.classList].some(
-                        cls => cls === 'expanded',
-                    );
-
-                    window.requestAnimationFrame(() => {
-                        $expandedDetails.classList.toggle('expanded', !haveDetailsExpandedClass);
-                    });
-                });
-
-                const buildDepartureLine = (item, index) => `
-                    <div class="left">
-                        <div class="time">
-                            <strong>${mapperService.departure.getTimeString(item)}</strong>
-                            ${index === 0 ? '<br>Indulás' : ''}
-                        </div>
-                    </div>
-                    <div class="middle">
-                        <div class="city">${mapperService.departure.getStationCity(item)}</div>
-                        <div class="station">${mapperService.departure.getStationName(item)}</div>
-                        <div class="step-info">
-                            <div class="duration">
-                                ${mapperService.route.getDistance(item)} km
-                                <br>
-                                ${mapperService.route.getDurationInMinutes(item)} perc
-                            </div>
-                            <div></div>
-                            <div class="cl"></div>
-                            <div class="operator"></div>
-                        </div>
-                    </div>
-                    <div class="right"></div>
-                `;
-
-                const buildTransferLine = item => `
-                    <div class="left">
-                        <div class="time">
-                            <strong>${mapperService.arrival.getTimeString(item)}</strong>
-                        </div>
-                    </div>
-                    <div class="middle">
-                        <div class="step-details">
-                            <div class="city">
-                                ${mapperService.arrival.getStationCity(item)}
-                            </div>
-                            <div class="station">
-                                ${mapperService.arrival.getStationName(item)}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="right"></div>
-                `;
-
-                const buildTerminusLine = item => `
-                    <div class="left">
-                        <div class="time">
-                            <strong>${mapperService.arrival.getTimeString(item)}</strong>
-                            <br>Érkezés
-                        </div>
-                    </div>
-                    <div class="middle">
-                        <div class="step-details">
-                            <div class="city">
-                                ${mapperService.arrival.getStationCity(item)}
-                            </div>
-                            <div class="station">
-                                ${mapperService.arrival.getStationName(item)}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="right"></div>
-                `;
-
-                const buildDetails = (acc, item, index, arr) => {
-                    const isFirstStep = index === 0;
-                    const isLastStep = index === arr.length - 1;
-                    const isOneBeforeLastStep = index === arr.length - 2;
-                    const isMultipleStepsTravel = arr.length > 1;
-                    const isInterimStep = isMultipleStepsTravel && !isLastStep;
-
-                    return `
-                        ${acc}
-                        ${isFirstStep ? `<div class="step departure-station">${buildDepartureLine(item, index)}</div>` : ''}
-                        ${isFirstStep && isMultipleStepsTravel ? `<div class="step transfer">${buildTransferLine(item, index)}</div>` : ''}
-
-                        ${isInterimStep ? `
-                            <div class="step interim">
-                                ${buildDepartureLine(arr[index + 1], index + 1)}
-                            </div>
-                            ${isOneBeforeLastStep ? '' : `<div class="step transfer">${buildTransferLine(item, index)}</div>`}
-                        ` : ''}
-
-                        ${isLastStep ? `<div class="step terminus">${buildTerminusLine(item, index)}</div>` : ''}
-                    `;
-                };
-
-                const stepsMarkup = Object.values(rawData).reduce(
-                    (acc, item, index, arr) => buildDetails(acc, item, index, arr),
-                    '',
-                );
-
-                $expandedDetails.innerHTML = `
-                    <div class="travel-steps">
-                        ${stepsMarkup}
-                    </div>`;
             }
 
             set item(value) {
                 this.itemData = value;
                 this.render();
+                this.$details.details = value; // TODO separate from value, what really is needed for the details
             }
         },
     );
@@ -326,6 +240,9 @@ const init = async () => {
         const style = await fetch('./assets/css/scheduleItemStyles.css').then(response =>
             response.text(),
         );
+
+        // Can't this be lazy loaded on first open/expand?
+        await customElements.whenDefined('schedule-item-details');
 
         registerComponent({ style });
     }
