@@ -2,6 +2,9 @@ import './components/common/header.js';
 import './components/common/footer.js';
 import './components/pages/schedules/schedulesPage.js';
 import './components/pages/search/searchPage.js';
+import './components/pages/routes/routesPage.js';
+
+import idbService from './services/idbService.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -19,9 +22,10 @@ template.innerHTML = `
     <app-header></app-header>
 
     <main>
-        <!-- temporary placement of both pages until developed -->
+        <!-- temporary placement of all pages until developed -->
         <search-page></search-page>
-        <schedules-page></schedules-page>
+        <routes-page></routes-page>
+        <!-- <schedules-page></schedules-page> -->
     </main>
 
     <app-footer></app-footer>
@@ -39,16 +43,16 @@ const registerComponent = () => {
             }
 
             connectedCallback() {
-                const $currentDaySchedulesList = this.root.querySelector('schedules-page');
+                // const $currentDaySchedulesList = this.root.querySelector('schedules-page');
 
                 // Importing temporary development mocks' - to be removed when app is capable to access live data
                 (async () => {
-                    const result = await import('./mockData/Tihany_Dombovar.js').then(
-                        module => module.default,
-                    );
+                    // const result = await import('./mockData/Tihany_Dombovar.js').then(
+                    //     module => module.default,
+                    // );
 
-                    this.$schedules = $currentDaySchedulesList;
-                    this.$schedules.schedules = result.results.talalatok;
+                    // this.$schedules = $currentDaySchedulesList;
+                    // this.$schedules.schedules = result.results.talalatok;
 
                     window.requestAnimationFrame(() => {
                         this.style.display = 'block';
@@ -62,28 +66,24 @@ const registerComponent = () => {
 const init = async () => {
     if (!('serviceWorker' in navigator)) {
         // TODO: modal notification about the constraints this means
-        console.log(
-            'Service Workers are not supported by your browser, thus only only features of this app are accesible',
-        );
+        console.log('Service Workers are not supported by your browser');
         return;
     }
 
-    await navigator.serviceWorker
-        .register('/src/service-worker.js')
-        .then(registration => {
-            console.log('Registration successful, scope is:', registration.scope);
-        })
-        .catch(error => {
-            // TODO use this to notify the users the limitations this implies
-            console.log('Service worker registration failed, error:', error);
-        });
+    await navigator.serviceWorker.register('/src/service-worker.js').catch(error => {
+        // TODO use this to notify the users the limitations this implies
+        console.log('Service worker registration failed, error:', error);
+    });
 
     if (!window.customElements.get('my-schedules-app')) {
+        await idbService.getInstance();
+
         await Promise.all([
             customElements.whenDefined('app-header'),
             customElements.whenDefined('app-footer'),
             customElements.whenDefined('schedules-page'),
             customElements.whenDefined('search-page'),
+            customElements.whenDefined('routes-page'),
         ]);
 
         registerComponent();

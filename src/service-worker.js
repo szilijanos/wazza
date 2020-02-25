@@ -23,6 +23,7 @@ const staticFilesToCache = [
     'components/pages/search/searchPage.js',
     'services/dataMapperService.js',
     'services/searchFormService.js',
+    'state/pageState.js',
     'mockData/Tihany_Dombovar.js', // this is not static, and shall be removed, once dynamic caching works
 ];
 
@@ -59,7 +60,7 @@ self.addEventListener('fetch', event => {
                     return response;
                 }
 
-                console.log('Network request for ', event.request.url);
+                // console.log('Network request for ', event.request.url);
                 return fetch(event.request);
             })
             .catch(error => {

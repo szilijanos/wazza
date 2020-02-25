@@ -1,18 +1,18 @@
-function searchRoute(/* from, to */) {
+function searchRoute({ from, to }) {
     const myHeaders = new Headers();
     myHeaders.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 
     const queryJson = {
         func: 'getRoutes',
         params: {
-            datum: '2020-03-17',
+            datum: '2020-05-17',
             erk_stype: 'megallo',
             ext_settings: 'block',
             filtering: 0,
             helyi: 'No',
-            honnan: 'Budapest',
+            honnan: from,
             hour: '00',
-            hova: 'Kiskunhalas',
+            hova: to,
             ind_stype: 'megallo',
             keresztul_stype: 'megallo',
             maxatszallas: '5',
@@ -34,11 +34,17 @@ function searchRoute(/* from, to */) {
         body: payload,
     };
 
-    const url = 'http://127.0.0.1:5501';
-    fetch(url, requestOptions)
+    const serverUrl = 'http://127.0.0.1:5501';
+
+    return fetch(serverUrl, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response;
+        })
         .then(response => response.text())
-        .then(result => console.log(result))
-        .catch(error => console.log('error', error));
+        .catch(error => console.log('error', error)); // TODO
 }
 
 export default {

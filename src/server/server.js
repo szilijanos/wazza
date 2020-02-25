@@ -10,7 +10,7 @@ function sendOutboundRequest(payload) {
         hostname: baseUrl,
         path: searchRoutesPath,
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         },
         maxRedirects: 5,
     };
@@ -42,7 +42,7 @@ function sendOutboundRequest(payload) {
 function serve() {
     http.createServer((request, response) => {
         response.writeHead(200, {
-            'Content-Type': 'text/html',
+            'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': 'http://127.0.0.1:5500',
         });
 
