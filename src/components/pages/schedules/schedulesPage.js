@@ -47,7 +47,9 @@ const registerComponent = () => {
                     $ul.appendChild($li);
                 });
 
-                this.$currentDaySchedulesList.appendChild($ul);
+                requestAnimationFrame(() => {
+                    this.$currentDaySchedulesList.appendChild($ul);
+                });
             }
 
             set schedules(_schedules) {

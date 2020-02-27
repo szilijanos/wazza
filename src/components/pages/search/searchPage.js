@@ -12,7 +12,9 @@ template.innerHTML = `
             <input type="text" id="route_to" placeholder="Hová?" autocomplete="off">
             <input type="date">
             <input type="time">
-            <input type="submit" value="Keresés"></input>
+
+            <!-- TODO: REMOVE INLINE STYLE WHEN STYLED FROM SCSS -->
+            <input style="display:block" type="submit" value="Keresés"></input>
         </form>
     </section>
 `;
@@ -60,18 +62,24 @@ const registerComponent = () => {
                 }
             }
 
+            dispatchRoutesUpdate(event) {
+                document.dispatchEvent(
+                    new CustomEvent('Routes::Update', {
+                        detail: { ...event.newValue },
+                    }),
+                );
+                console.log(this, event.newValue);
+            }
+
             async processResponse(result, { from, to }) {
                 const savedRoutesList = await idbService.add({
                     name: `${from} - ${to}`,
                     result,
                 });
 
-                // TODO implement this method in the routes list component
-                function renderRoutesList(event) {
-                    console.log(this, event);
-                }
-
-                pageState.routes.value.savedRoutes.handlers = [renderRoutesList];
+                pageState.routes.value.savedRoutes.handlers = [
+                    event => this.dispatchRoutesUpdate(event),
+                ];
                 pageState.routes.value.savedRoutes = [...savedRoutesList];
                 console.log(this);
             }
