@@ -33,7 +33,7 @@ const traps = {
 
             if (handlers && Array.isArray(handlers)) {
                 handlers.forEach(fn =>
-                    fn.call(null, {
+                    fn({
                         eventName: 'onChange',
                         newValue: node[prop].value,
                         oldValue,
