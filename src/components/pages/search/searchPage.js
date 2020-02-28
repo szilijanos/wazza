@@ -72,7 +72,7 @@ const registerComponent = () => {
             }
 
             async processResponse(result, { from, to }) {
-                const savedRoutesList = await idbService.add({
+                const savedRoutesList = await idbService.putRoute({
                     name: `${from} - ${to}`,
                     result,
                 });

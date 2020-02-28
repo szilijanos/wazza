@@ -34,6 +34,7 @@ function searchRoute({ from, to }) {
         body: payload,
     };
 
+    // TODO move this into config
     const serverUrl = 'http://127.0.0.1:5501';
 
     return fetch(serverUrl, requestOptions)

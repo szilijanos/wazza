@@ -1,6 +1,22 @@
+import './routeItem.js';
+
+import idbService from '../../../services/idbService.js';
+
 const template = document.createElement('template');
 
 template.innerHTML = `
+    <style>
+        ul {
+            padding-inline-start: 0;
+            margin-block-start:   0;
+            margin-block-end:     0;
+        }
+
+        li {
+            list-style-type: none;
+        }
+    </style>
+
     <section id="routes"></section>
 `;
 
@@ -19,6 +35,11 @@ const registerComponent = () => {
 
             connectedCallback() {
                 this.$form = this.root.querySelector('#routes-form');
+
+                idbService.getRoutesList().then(list => {
+                    this.routesListUpdateHandler({ detail: list });
+                });
+
                 document.addEventListener(
                     'Routes::Update',
                     this.routesListUpdateHandler.bind(this),
@@ -44,11 +65,8 @@ const registerComponent = () => {
 
                 Object.values(this.routesListData).forEach(item => {
                     const $li = document.createElement('li');
-                    const $routeListItem = document.createElement('p');
-                    // $routeListItem.item = { ...item };
-
-                    // TODO - make a routeListItem component and use that
-                    $routeListItem.textContent = item;
+                    const $routeListItem = document.createElement('route-item');
+                    $routeListItem.item = item;
 
                     $li.appendChild($routeListItem);
                     $ul.appendChild($li);
@@ -63,7 +81,11 @@ const registerComponent = () => {
 };
 
 const init = async () => {
-    registerComponent();
+    if (!window.customElements.get('routes-page')) {
+        await customElements.whenDefined('route-item');
+
+        registerComponent();
+    }
 };
 
 init();

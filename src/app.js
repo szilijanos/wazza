@@ -22,10 +22,10 @@ template.innerHTML = `
     <app-header></app-header>
 
     <main>
-        <!-- temporary placement of all pages until developed -->
+        <!-- TODO temporary placement of all pages until developed, then each goes to its own page, in a routed manner -->
         <search-page></search-page>
         <routes-page></routes-page>
-        <!-- <schedules-page></schedules-page> -->
+        <schedules-page></schedules-page>
     </main>
 
     <app-footer></app-footer>
@@ -43,21 +43,9 @@ const registerComponent = () => {
             }
 
             connectedCallback() {
-                // const $currentDaySchedulesList = this.root.querySelector('schedules-page');
-
-                // Importing temporary development mocks' - to be removed when app is capable to access live data
-                (async () => {
-                    // const result = await import('./mockData/Tihany_Dombovar.js').then(
-                    //     module => module.default,
-                    // );
-
-                    // this.$schedules = $currentDaySchedulesList;
-                    // this.$schedules.schedules = result.results.talalatok;
-
-                    window.requestAnimationFrame(() => {
-                        this.style.display = 'block';
-                    });
-                })();
+                window.requestAnimationFrame(() => {
+                    this.style.display = 'block';
+                });
             }
         },
     );

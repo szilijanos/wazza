@@ -5,7 +5,7 @@ const config = {
     dbInitTimeoutMs: 10000,
 };
 
-const getAllRoutesNames = () =>
+const getRoutesList = () =>
     new Promise((resolve, reject) => {
         const request = pageState.dbInstance.value
             .transaction(['routes'], 'readonly')
@@ -21,7 +21,27 @@ const getAllRoutesNames = () =>
         };
     });
 
-const add = ({ name, result }) =>
+const getRouteSchedules = routeKey =>
+    new Promise((resolve, reject) => {
+        const request = pageState.dbInstance.value
+            .transaction(['routes'], 'readonly')
+            .objectStore('routes')
+            .get(routeKey);
+
+        request.onsuccess = () => {
+            resolve(request.result);
+        };
+
+        request.onerror = event => {
+            reject(
+                new Error(
+                    `Unable to read data for ${routeKey} is already exist in database! (${event})`,
+                ),
+            );
+        };
+    });
+
+const addRoute = ({ name, result }) =>
     new Promise((resolve, reject) => {
         const request = pageState.dbInstance.value
             .transaction(['routes'], 'readwrite')
@@ -29,12 +49,30 @@ const add = ({ name, result }) =>
             .add({ name, result });
 
         request.onsuccess = () => {
-            resolve(getAllRoutesNames());
+            resolve(getRoutesList());
         };
 
         request.onerror = event => {
             reject(
                 new Error(`Unable to add data\r\n${name} is already exist in database! (${event})`),
+            );
+        };
+    });
+
+const putRoute = ({ name, result }) =>
+    new Promise((resolve, reject) => {
+        const request = pageState.dbInstance.value
+            .transaction(['routes'], 'readwrite')
+            .objectStore('routes')
+            .put({ name, result });
+
+        request.onsuccess = () => {
+            resolve(getRoutesList());
+        };
+
+        request.onerror = event => {
+            reject(
+                new Error(`Unable to add or overwrite data with existing key: ${name}, (${event})`),
             );
         };
     });
@@ -98,6 +136,8 @@ function getInstance() {
 
 export default {
     getInstance,
-    add,
-    getAllRoutesNames,
+    addRoute,
+    putRoute,
+    getRouteSchedules,
+    getRoutesList,
 };
