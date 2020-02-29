@@ -33,18 +33,16 @@ const registerComponent = () => {
             connectedCallback() {
                 this.$currentDaySchedulesList = this.root.querySelector('#results-list-body');
 
-                document.addEventListener(
-                    'SelectedSchedule::Update',
-                    // TODO - this is not good: not the same fn reference in disconnected!!
-                    this.schedulesListUpdateHandler.bind(this),
-                );
+                this.scheduledChangedHandler = this.schedulesListUpdateHandler.bind(this);
+
+                document.addEventListener('SelectedSchedule::Update', this.scheduledChangedHandler);
             }
 
             disconnectedCallback() {
-                /* document.removeEventListener(
+                document.removeEventListener(
                     'SelectedSchedule::Update',
-                    this.schedulesListUpdateHandler.bind(this),
-                ); */
+                    this.scheduledChangedHandler,
+                );
             }
 
             render() {

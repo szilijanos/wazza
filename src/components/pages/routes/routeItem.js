@@ -26,7 +26,8 @@ const registerComponent = dependencies => {
             }
 
             connectedCallback() {
-                this.$routeItem.addEventListener('click', this.showSchedulesForRoute.bind(this));
+                this.routeSelectedHandler = this.showSchedulesForRoute.bind(this);
+                this.$routeItem.addEventListener('click', this.routeSelectedHandler);
 
                 pageState.schedules.value.selectedRouteSchedules.handlers = [
                     event => this.dispatchSchedulesUpdate(event),
@@ -34,7 +35,7 @@ const registerComponent = dependencies => {
             }
 
             disconnectedCallback() {
-                this.$routeItem.removeEventListener('click', this.showSchedulesForRoute.bind(this));
+                this.$routeItem.removeEventListener('click', this.routeSelectedHandler);
             }
 
             dispatchSchedulesUpdate(event) {
@@ -53,6 +54,11 @@ const registerComponent = dependencies => {
                         JSON.parse(schedules.result).results.talalatok,
                     );
                     pageState.schedules.value.selectedRouteSchedules = [...parsedResult];
+
+                    // TODO rebind handler on update in the pageState
+                    pageState.schedules.value.selectedRouteSchedules.handlers = [
+                        event => this.dispatchSchedulesUpdate(event),
+                    ];
 
                     console.log(pageState.schedules.value.selectedRouteSchedules);
                 });
