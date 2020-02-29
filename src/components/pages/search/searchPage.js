@@ -1,7 +1,7 @@
 import searchFormService from '../../../services/searchFormService.js';
 import idbService from '../../../services/idbService.js';
 
-import { pageState } from '../../../state/pageState.js';
+import pageState from '../../../state/pageState.js';
 
 const template = document.createElement('template');
 
@@ -42,6 +42,10 @@ const registerComponent = () => {
                     $from: this.root.querySelector('input#route_from'),
                     $to: this.root.querySelector('input#route_to'),
                 };
+
+                pageState.routes.value.savedRoutes.handlers = [
+                    event => this.dispatchRoutesUpdate(event),
+                ];
             }
 
             async handleSubmit(event) {
@@ -77,9 +81,6 @@ const registerComponent = () => {
                     result,
                 });
 
-                pageState.routes.value.savedRoutes.handlers = [
-                    event => this.dispatchRoutesUpdate(event),
-                ];
                 pageState.routes.value.savedRoutes = [...savedRoutesList];
                 console.log(this);
             }

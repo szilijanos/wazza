@@ -32,6 +32,19 @@ const registerComponent = () => {
 
             connectedCallback() {
                 this.$currentDaySchedulesList = this.root.querySelector('#results-list-body');
+
+                document.addEventListener(
+                    'SelectedSchedule::Update',
+                    // TODO - this is not good: not the same fn reference in disconnected!!
+                    this.schedulesListUpdateHandler.bind(this),
+                );
+            }
+
+            disconnectedCallback() {
+                /* document.removeEventListener(
+                    'SelectedSchedule::Update',
+                    this.schedulesListUpdateHandler.bind(this),
+                ); */
             }
 
             render() {
@@ -50,6 +63,11 @@ const registerComponent = () => {
                 requestAnimationFrame(() => {
                     this.$currentDaySchedulesList.appendChild($ul);
                 });
+            }
+
+            schedulesListUpdateHandler({ detail }) {
+                console.log(detail);
+                this.schedules = detail;
             }
 
             set schedules(_schedules) {

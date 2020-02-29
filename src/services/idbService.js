@@ -1,4 +1,4 @@
-import { pageState } from '../state/pageState.js';
+import pageState from '../state/pageState.js';
 
 // TODO move this into a config
 const config = {
@@ -83,6 +83,7 @@ const isIndexedDbSupported = () => {
 
     const IDBTransaction =
         window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
+
     const IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
 
     return indexedDB && IDBKeyRange && IDBTransaction;

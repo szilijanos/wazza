@@ -1,5 +1,7 @@
 import idbService from '../../../services/idbService.js';
 
+import pageState from '../../../state/pageState.js';
+
 const template = document.createElement('template');
 template.innerHTML = `
     <div class='route'>
@@ -25,16 +27,34 @@ const registerComponent = dependencies => {
 
             connectedCallback() {
                 this.$routeItem.addEventListener('click', this.showSchedulesForRoute.bind(this));
+
+                pageState.schedules.value.selectedRouteSchedules.handlers = [
+                    event => this.dispatchSchedulesUpdate(event),
+                ];
             }
 
             disconnectedCallback() {
                 this.$routeItem.removeEventListener('click', this.showSchedulesForRoute.bind(this));
             }
 
+            dispatchSchedulesUpdate(event) {
+                document.dispatchEvent(
+                    new CustomEvent('SelectedSchedule::Update', {
+                        detail: { ...event.newValue },
+                    }),
+                );
+                console.log(this, event.newValue);
+            }
+
             showSchedulesForRoute() {
                 // TODO
                 idbService.getRouteSchedules(this.itemData).then(schedules => {
-                    console.log(schedules);
+                    const parsedResult = Object.values(
+                        JSON.parse(schedules.result).results.talalatok,
+                    );
+                    pageState.schedules.value.selectedRouteSchedules = [...parsedResult];
+
+                    console.log(pageState.schedules.value.selectedRouteSchedules);
                 });
             }
 

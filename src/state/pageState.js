@@ -11,6 +11,9 @@ const schema = {
     routes: {
         savedRoutes: [],
     },
+    schedules: {
+        selectedRouteSchedules: [],
+    },
 };
 
 const traps = {
@@ -82,4 +85,4 @@ function decorate(obj) {
     return state;
 }
 
-export const pageState = decorate(schema);
+export default decorate(schema);
