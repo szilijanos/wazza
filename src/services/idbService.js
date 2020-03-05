@@ -77,6 +77,22 @@ const putRoute = ({ name, result }) =>
         };
     });
 
+const deleteRoute = name =>
+    new Promise((resolve, reject) => {
+        const request = pageState.dbInstance.value
+            .transaction(['routes'], 'readwrite')
+            .objectStore('routes')
+            .delete(name);
+
+        request.onsuccess = () => {
+            resolve(getRoutesList());
+        };
+
+        request.onerror = event => {
+            reject(new Error(`Unable to delete key: ${name}, (${event})`));
+        };
+    });
+
 const isIndexedDbSupported = () => {
     const indexedDB =
         window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
@@ -139,6 +155,7 @@ export default {
     getInstance,
     addRoute,
     putRoute,
+    deleteRoute,
     getRouteSchedules,
     getRoutesList,
 };

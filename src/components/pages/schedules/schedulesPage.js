@@ -64,7 +64,6 @@ const registerComponent = () => {
             }
 
             schedulesListUpdateHandler({ detail }) {
-                console.log(detail);
                 this.schedules = detail;
             }
 

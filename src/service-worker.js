@@ -5,25 +5,29 @@
 // 'self' is a global, that should be accessed, as it reference to the sw instance
 
 const staticFilesToCache = [
-    //    'app.js',
-    //    'index.html',
-    //    'global.css',
-    //    'assets/css/scheduleItemStyles.css',
-    //    'assets/css/scheduleItemDetailsStyles.css',
-    //    'assets/icons/favicon.ico',
-    //    'assets/icons/icon-bus.svg',
-    //    'assets/icons/icon-ship.svg',
-    //    'assets/icons/icon-train.svg',
-    //    'components/common/footer.js',
-    //    'components/common/header.js',
-    //    'components/pages/schedules/resultsHeader.js',
-    //    'components/pages/schedules/scheduleItem.js',
-    //    'components/pages/schedules/scheduleItemDetails.js',
-    //    'components/pages/schedules/schedulesPage.js',
-    //    'components/pages/search/searchPage.js',
-    //    'services/dataMapperService.js',
-    //    'services/searchFormService.js',
-    //    'state/pageState.js'
+    /*     'app.js',
+    'index.html',
+    'global.css',
+    'assets/css/scheduleItemStyles.css',
+    'assets/css/scheduleItemDetailsStyles.css',
+    'assets/css/routeItemStyles.css',
+    'assets/icons/favicon.ico',
+    'assets/icons/icon-bus.svg',
+    'assets/icons/icon-ship.svg',
+    'assets/icons/icon-train.svg',
+    'components/common/footer.js',
+    'components/common/header.js',
+    'components/pages/schedules/resultsHeader.js',
+    'components/pages/schedules/scheduleItem.js',
+    'components/pages/schedules/scheduleItemDetails.js',
+    'components/pages/schedules/schedulesPage.js',
+    'components/pages/search/searchPage.js',
+    'components/pages/routes/routesPage.js',
+    'components/pages/routes/routeItem.js',
+    'services/dataMapperService.js',
+    'services/searchFormService.js',
+    'services/idbService.js',
+    'state/pageState.js' */
 ];
 
 const staticCacheVersion = 'v1.0';

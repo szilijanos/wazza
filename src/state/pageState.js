@@ -29,12 +29,14 @@ const traps = {
 
         if (isObject(node[prop]) && typeof node[prop].value !== 'undefined') {
             const { handlers } = node[prop];
-            // console.log('pre::set', node[prop].value, newValue)
+
             const oldValue = node[prop].value;
             node[prop] = new Proxy({ value: newValue }, traps);
-            // console.log('post::set', node[prop].value, newValue)
 
             if (handlers && Array.isArray(handlers)) {
+                // rebind handlers
+                node[prop].handlers = handlers;
+
                 handlers.forEach(fn =>
                     fn({
                         eventName: 'onChange',

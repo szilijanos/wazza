@@ -5,14 +5,15 @@ import pageState from '../../../state/pageState.js';
 const template = document.createElement('template');
 template.innerHTML = `
     <div class='route'>
-
+        <span class="description"></span>
+        <button class="delete">Törlés</button>
     </div>
 `;
 
 const registerComponent = dependencies => {
     window.customElements.define(
         'route-item',
-        class extends HTMLElement {
+        class RouteItem extends HTMLElement {
             constructor() {
                 super();
                 this.root = this.attachShadow({ mode: 'open' });
@@ -23,11 +24,16 @@ const registerComponent = dependencies => {
                 this.root.prepend(styleNode);
 
                 this.$routeItem = this.root.querySelector('.route');
+                this.$routeItemDescription = this.$routeItem.querySelector('span.description');
+                this.$routeItemDeleteCta = this.$routeItem.querySelector('button.delete');
             }
 
             connectedCallback() {
                 this.routeSelectedHandler = this.showSchedulesForRoute.bind(this);
-                this.$routeItem.addEventListener('click', this.routeSelectedHandler);
+                this.$routeItemDescription.addEventListener('click', this.routeSelectedHandler);
+
+                this.routeDeleteHandler = this.deleteRoute.bind(this);
+                this.$routeItemDeleteCta.addEventListener('click', this.routeDeleteHandler);
 
                 pageState.schedules.value.selectedRouteSchedules.handlers = [
                     event => this.dispatchSchedulesUpdate(event),
@@ -35,16 +41,16 @@ const registerComponent = dependencies => {
             }
 
             disconnectedCallback() {
-                this.$routeItem.removeEventListener('click', this.routeSelectedHandler);
+                this.$routeItemDescription.removeEventListener('click', this.routeSelectedHandler);
+                this.$routeItemDeleteCta.removeEventListener('click', this.routeDeleteHandler);
             }
 
-            dispatchSchedulesUpdate(event) {
+            static dispatchSchedulesUpdate(event) {
                 document.dispatchEvent(
                     new CustomEvent('SelectedSchedule::Update', {
                         detail: { ...event.newValue },
                     }),
                 );
-                console.log(this, event.newValue);
             }
 
             showSchedulesForRoute() {
@@ -55,18 +61,22 @@ const registerComponent = dependencies => {
                     );
                     pageState.schedules.value.selectedRouteSchedules = [...parsedResult];
 
-                    // TODO rebind handler on update in the pageState
                     pageState.schedules.value.selectedRouteSchedules.handlers = [
-                        event => this.dispatchSchedulesUpdate(event),
+                        event => RouteItem.dispatchSchedulesUpdate(event),
                     ];
+                });
+            }
 
-                    console.log(pageState.schedules.value.selectedRouteSchedules);
+            deleteRoute() {
+                // TODO confirmation popup
+                idbService.deleteRoute(this.itemData).then(schedules => {
+                    pageState.routes.value.savedRoutes.value = [...schedules];
                 });
             }
 
             render() {
                 const htmlContent = this.itemData;
-                this.$routeItem.innerHTML = htmlContent;
+                this.$routeItemDescription.innerHTML = htmlContent;
             }
 
             set item(value) {

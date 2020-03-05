@@ -1,4 +1,8 @@
-import searchFormService from '../../../services/searchFormService.js';
+// import searchFormService from '../../../services/searchFormService.js';
+
+// TODO remove this and use searchFormService from live data
+import mockData from '../../../mockData/Tihany_Dombovar.js';
+
 import idbService from '../../../services/idbService.js';
 
 import pageState from '../../../state/pageState.js';
@@ -22,7 +26,7 @@ template.innerHTML = `
 const registerComponent = () => {
     window.customElements.define(
         'search-page',
-        class extends HTMLElement {
+        class SearchPage extends HTMLElement {
             isValid;
 
             constructor() {
@@ -44,14 +48,14 @@ const registerComponent = () => {
                 };
 
                 pageState.routes.value.savedRoutes.handlers = [
-                    event => this.dispatchRoutesUpdate(event),
+                    event => SearchPage.dispatchRoutesUpdate(event),
                 ];
             }
 
             async handleSubmit(event) {
                 event.preventDefault();
 
-                // TODO...
+                // TODO: Validation...
                 if (this.isValid) {
                     const { $from, $to } = this.inputs;
 
@@ -60,29 +64,28 @@ const registerComponent = () => {
                         to: $to.value,
                     };
 
-                    const result = await searchFormService.searchRoute(queryData);
+                    //  const result = await searchFormService.searchRoute(queryData);
+                    const result = JSON.stringify(mockData);
 
-                    this.processResponse(result, queryData);
+                    SearchPage.processResponse(result, queryData);
                 }
             }
 
-            dispatchRoutesUpdate(event) {
+            static dispatchRoutesUpdate(event) {
                 document.dispatchEvent(
                     new CustomEvent('Routes::Update', {
                         detail: { ...event.newValue },
                     }),
                 );
-                console.log(this, event.newValue);
             }
 
-            async processResponse(result, { from, to }) {
+            static async processResponse(result, { from, to }) {
                 const savedRoutesList = await idbService.putRoute({
                     name: `${from} - ${to}`,
                     result,
                 });
 
                 pageState.routes.value.savedRoutes = [...savedRoutesList];
-                console.log(this);
             }
         },
     );

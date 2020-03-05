@@ -35,26 +35,20 @@ const registerComponent = () => {
 
             connectedCallback() {
                 this.$form = this.root.querySelector('#routes-form');
+                this.routesListChangeHandler = this.routesListUpdateHandler.bind(this);
 
                 idbService.getRoutesList().then(list => {
-                    this.routesListUpdateHandler({ detail: list });
+                    this.routesListChangeHandler({ detail: list });
                 });
 
-                document.addEventListener(
-                    'Routes::Update',
-                    this.routesListUpdateHandler.bind(this),
-                );
+                document.addEventListener('Routes::Update', this.routesListChangeHandler);
             }
 
             disconnectedCallback() {
-                document.removeEventListener(
-                    'Routes::Update',
-                    this.routesListUpdateHandler.bind(this),
-                );
+                document.removeEventListener('Routes::Update', this.routesListChangeHandler);
             }
 
             routesListUpdateHandler({ detail }) {
-                console.log(detail);
                 this.routesListData = detail;
                 this.render();
             }
