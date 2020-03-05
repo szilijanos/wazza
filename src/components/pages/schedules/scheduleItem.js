@@ -1,4 +1,4 @@
-import mapperService from '../../../services/dataMapperService.js';
+import dataConversionService from '../../../services/dataConversionService.js';
 import './scheduleItemDetails.js';
 
 const template = document.createElement('template');
@@ -91,34 +91,34 @@ const registerComponent = dependencies => {
                 );
                 $('.departure > span.pref').innerHTML = Object.values(rawData).reduce(
                     (acc, item) => {
-                        const details = mapperService.route.getVehicleDetails(item);
+                        const details = dataConversionService.route.getVehicleDetails(item);
                         return `${acc}<img alt="${details.type}" class="icon-${details.type}" src="./assets/icons/icon-${details.type}.svg"  width="15" height="20">`;
                     },
                     '',
                 );
 
-                $('.departure > span.city').textContent = mapperService.departure.getStationCity(
-                    rawData[0],
-                );
-                $('.departure > span.station').textContent = mapperService.departure.getStationName(
-                    rawData[0],
-                );
-                $('.departure > span.time').textContent = mapperService.departure.getTimeString(
-                    rawData[0],
-                );
-                $('.arrival > span.city').textContent = mapperService.arrival.getStationCity(
-                    rawData[lastIndex],
-                );
-                $('.arrival > span.station').textContent = mapperService.arrival.getStationName(
-                    rawData[lastIndex],
-                );
-                $('.arrival > span.time').textContent = mapperService.arrival.getTimeString(
+                $(
+                    '.departure > span.city',
+                ).textContent = dataConversionService.departure.getStationCity(rawData[0]);
+                $(
+                    '.departure > span.station',
+                ).textContent = dataConversionService.departure.getStationName(rawData[0]);
+                $(
+                    '.departure > span.time',
+                ).textContent = dataConversionService.departure.getTimeString(rawData[0]);
+                $(
+                    '.arrival > span.city',
+                ).textContent = dataConversionService.arrival.getStationCity(rawData[lastIndex]);
+                $(
+                    '.arrival > span.station',
+                ).textContent = dataConversionService.arrival.getStationName(rawData[lastIndex]);
+                $('.arrival > span.time').textContent = dataConversionService.arrival.getTimeString(
                     rawData[lastIndex],
                 );
 
                 const runDayInfo = () =>
                     Object.values(rawData).reduce((acc, item, index) => {
-                        const current = mapperService.route.getDaysRunning(item);
+                        const current = dataConversionService.route.getDaysRunning(item);
                         const regexDailyAndWorkdaysOnly = /naponta|munkanapokon/;
 
                         if (
@@ -137,7 +137,7 @@ const registerComponent = dependencies => {
                     </span> | ${runDayInfo()}`;
 
                 const getVehicleBoxMarkup = item => {
-                    const currentVehicle = mapperService.route.getVehicleDetails(item);
+                    const currentVehicle = dataConversionService.route.getVehicleDetails(item);
 
                     return `<div class="vehicleBox ${currentVehicle.type}">
                                 ${currentVehicle.lineNumber}
@@ -146,7 +146,7 @@ const registerComponent = dependencies => {
 
                 $('.short-details > div.vehicleDiv').innerHTML = Object.values(rawData).reduce(
                     (acc, item) => {
-                        if (mapperService.route.isLocalTransportNecessaryAfter(item)) {
+                        if (dataConversionService.route.isLocalTransportNecessaryAfter(item)) {
                             return `${acc}
                                     ${getVehicleBoxMarkup(item)}
                                     <div class="vehicleBox local">Helyi</div>
@@ -158,7 +158,9 @@ const registerComponent = dependencies => {
                     '',
                 );
 
-                const totalDistance = mapperService.route.getTotalDistance(Object.values(rawData));
+                const totalDistance = dataConversionService.route.getTotalDistance(
+                    Object.values(rawData),
+                );
                 $('.short-details > div.routemap').innerHTML = Object.values(rawData).reduce(
                     (acc, item, index, arr) => {
                         if (arr.length === 1) {
@@ -167,7 +169,7 @@ const registerComponent = dependencies => {
                             };
                         }
 
-                        const itemDistance = mapperService.route.getDistance(item);
+                        const itemDistance = dataConversionService.route.getDistance(item);
 
                         if (index === 0) {
                             const currentOffset = itemDistance;
@@ -209,7 +211,7 @@ const registerComponent = dependencies => {
 
                 const getTravelSummaryData = () => {
                     const km = totalDistance.toFixed(Number.isInteger(totalDistance) ? 0 : 1);
-                    const duration = mapperService.route
+                    const duration = dataConversionService.route
                         .getTotalTimeString(Object.values(rawData))
                         .split(':')
                         .reduce(

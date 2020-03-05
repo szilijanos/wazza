@@ -87,8 +87,24 @@ const route = {
     isLocalTransportNecessaryAfter,
 };
 
+const extract = rawData => {
+    const parsed = JSON.parse(rawData);
+
+    const { status, results } = parsed;
+
+    const extracted = {
+        status,
+        results,
+    };
+
+    return extracted;
+};
+
 export default {
     arrival,
     departure,
     route,
+
+    // IN PROGRESS: this will be the only interface, to convert live data into the data to be stored (less size)
+    extract,
 };

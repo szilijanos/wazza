@@ -1,4 +1,4 @@
-import mapperService from '../../../services/dataMapperService.js';
+import dataConversionService from '../../../services/dataConversionService.js';
 
 const template = document.createElement('template');
 
@@ -20,18 +20,22 @@ const registerComponent = dependencies => {
                 const buildDepartureLine = (item, index) => `
                     <div class="left">
                         <div class="time">
-                            <strong>${mapperService.departure.getTimeString(item)}</strong>
+                            <strong>${dataConversionService.departure.getTimeString(item)}</strong>
                             ${index === 0 ? '<br>Indulás' : ''}
                         </div>
                     </div>
                     <div class="middle">
-                        <div class="city">${mapperService.departure.getStationCity(item)}</div>
-                        <div class="station">${mapperService.departure.getStationName(item)}</div>
+                        <div class="city">${dataConversionService.departure.getStationCity(
+                            item,
+                        )}</div>
+                        <div class="station">${dataConversionService.departure.getStationName(
+                            item,
+                        )}</div>
                         <div class="step-info">
                             <div class="duration">
-                                ${mapperService.route.getDistance(item)} km
+                                ${dataConversionService.route.getDistance(item)} km
                                 <br>
-                                ${mapperService.route.getDurationInMinutes(item)} perc
+                                ${dataConversionService.route.getDurationInMinutes(item)} perc
                             </div>
                             <div></div>
                             <div class="cl"></div>
@@ -44,16 +48,16 @@ const registerComponent = dependencies => {
                 const buildTransferLine = item => `
                     <div class="left">
                         <div class="time">
-                            <strong>${mapperService.arrival.getTimeString(item)}</strong>
+                            <strong>${dataConversionService.arrival.getTimeString(item)}</strong>
                         </div>
                     </div>
                     <div class="middle">
                         <div class="step-details">
                             <div class="city">
-                                ${mapperService.arrival.getStationCity(item)}
+                                ${dataConversionService.arrival.getStationCity(item)}
                             </div>
                             <div class="station">
-                                ${mapperService.arrival.getStationName(item)}
+                                ${dataConversionService.arrival.getStationName(item)}
                             </div>
                         </div>
                     </div>
@@ -63,17 +67,17 @@ const registerComponent = dependencies => {
                 const buildTerminusLine = item => `
                     <div class="left">
                         <div class="time">
-                            <strong>${mapperService.arrival.getTimeString(item)}</strong>
+                            <strong>${dataConversionService.arrival.getTimeString(item)}</strong>
                             <br>Érkezés
                         </div>
                     </div>
                     <div class="middle">
                         <div class="step-details">
                             <div class="city">
-                                ${mapperService.arrival.getStationCity(item)}
+                                ${dataConversionService.arrival.getStationCity(item)}
                             </div>
                             <div class="station">
-                                ${mapperService.arrival.getStationName(item)}
+                                ${dataConversionService.arrival.getStationName(item)}
                             </div>
                         </div>
                     </div>

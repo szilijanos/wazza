@@ -24,7 +24,7 @@ const staticFilesToCache = [
     'components/pages/search/searchPage.js',
     'components/pages/routes/routesPage.js',
     'components/pages/routes/routeItem.js',
-    'services/dataMapperService.js',
+    'services/dataConversionService.js',
     'services/searchFormService.js',
     'services/idbService.js',
     'state/pageState.js' */

@@ -36,7 +36,7 @@ const registerComponent = dependencies => {
                 this.$routeItemDeleteCta.addEventListener('click', this.routeDeleteHandler);
 
                 pageState.schedules.value.selectedRouteSchedules.handlers = [
-                    event => this.dispatchSchedulesUpdate(event),
+                    event => RouteItem.dispatchSchedulesUpdate(event),
                 ];
             }
 
@@ -56,10 +56,9 @@ const registerComponent = dependencies => {
             showSchedulesForRoute() {
                 // TODO
                 idbService.getRouteSchedules(this.itemData).then(schedules => {
-                    const parsedResult = Object.values(
-                        JSON.parse(schedules.result).results.talalatok,
-                    );
-                    pageState.schedules.value.selectedRouteSchedules = [...parsedResult];
+                    pageState.schedules.value.selectedRouteSchedules = [
+                        ...Object.values(schedules.result.results.talalatok),
+                    ];
 
                     pageState.schedules.value.selectedRouteSchedules.handlers = [
                         event => RouteItem.dispatchSchedulesUpdate(event),

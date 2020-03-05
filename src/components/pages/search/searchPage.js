@@ -1,4 +1,5 @@
 // import searchFormService from '../../../services/searchFormService.js';
+import dataConversionService from '../../../services/dataConversionService.js';
 
 // TODO remove this and use searchFormService from live data
 import mockData from '../../../mockData/Tihany_Dombovar.js';
@@ -64,11 +65,13 @@ const registerComponent = () => {
                         to: $to.value,
                     };
 
-                    // LIVE DATA:
-                    //  const result = await searchFormService.searchRoute(queryData);
+                    const result = dataConversionService.extract(
+                        // LIVE DATA:
+                        // await searchFormService.searchRoute(queryData)
 
-                    // MOCK DATA:
-                    const result = JSON.stringify(mockData);
+                        // MOCK DATA:
+                        JSON.stringify(mockData),
+                    );
 
                     SearchPage.processResponse(result, queryData);
                 }
@@ -83,12 +86,16 @@ const registerComponent = () => {
             }
 
             static async processResponse(result, { from, to }) {
-                const savedRoutesList = await idbService.putRoute({
-                    name: `${from} - ${to}`,
-                    result,
-                });
+                if (result.status === 'success') {
+                    const savedRoutesList = await idbService.putRoute({
+                        name: `${from} - ${to}`,
+                        result,
+                    });
 
-                pageState.routes.value.savedRoutes = [...savedRoutesList];
+                    pageState.routes.value.savedRoutes = [...savedRoutesList];
+                }
+
+                // TODO handle unsuccessful case
             }
         },
     );
