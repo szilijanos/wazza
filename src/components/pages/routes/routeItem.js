@@ -70,7 +70,7 @@ const registerComponent = dependencies => {
             deleteRoute() {
                 // TODO confirmation popup
                 idbService.deleteRoute(this.itemData).then(schedules => {
-                    pageState.routes.value.savedRoutes.value = [...schedules];
+                    pageState.routes.value.savedRoutes = [...schedules];
                 });
             }
 

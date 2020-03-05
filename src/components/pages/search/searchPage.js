@@ -64,7 +64,10 @@ const registerComponent = () => {
                         to: $to.value,
                     };
 
+                    // LIVE DATA:
                     //  const result = await searchFormService.searchRoute(queryData);
+
+                    // MOCK DATA:
                     const result = JSON.stringify(mockData);
 
                     SearchPage.processResponse(result, queryData);
