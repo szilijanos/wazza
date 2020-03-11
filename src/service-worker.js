@@ -33,32 +33,36 @@ const staticFilesToCache = [
 const staticCacheVersion = 'v1.0';
 const staticCacheName = `pages-cache-${staticCacheVersion}`;
 
-self.addEventListener('install', event => {
-    event.waitUntil(caches.open(staticCacheName).then(cache => cache.addAll(staticFilesToCache)));
+self.addEventListener('install', (event) => {
+    event.waitUntil(
+        caches.open(staticCacheName)
+            .then(
+                (cache) => cache.addAll(staticFilesToCache)
+            )
+    );
 });
 
-self.addEventListener('activate', event => {
+self.addEventListener('activate', (event) => {
     const cacheWhitelist = [staticCacheName];
 
     event.waitUntil(
-        caches.keys().then(cacheNames =>
-            Promise.all(
-                cacheNames.map(cacheName => {
+        caches.keys()
+            .then((cacheNames) => Promise.all(
+                cacheNames.map((cacheName) => {
                     if (cacheWhitelist.indexOf(cacheName) === -1) {
                         return caches.delete(cacheName);
                     }
                     return caches;
                 }),
-            ),
-        ),
+            ))
     );
 });
 
-self.addEventListener('fetch', event => {
+self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches
             .match(event.request.url)
-            .then(response => {
+            .then((response) => {
                 if (response) {
                     return response;
                 }
@@ -66,7 +70,7 @@ self.addEventListener('fetch', event => {
                 // console.log('Network request for ', event.request.url);
                 return fetch(event.request);
             })
-            .catch(error => {
+            .catch((error) => {
                 console.log(error);
                 // Respond with custom offline page
             }),

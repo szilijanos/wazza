@@ -3,11 +3,8 @@
     "version": "1.0.0",
     "description": "This app provides an alternative interface to menetrendek.hu with advanced features of storing and retreiving public transport schedules of Hungary",
     "scripts": {
-        "test": "karma start --coverage",
         "lint:eslint": "eslint --ext .js,.html . --ignore-path .gitignore",
         "format:eslint": "eslint --ext .js,.html . --fix --ignore-path .gitignore",
-        "lint:prettier": "prettier \"**/*.js\" --check --ignore-path .gitignore",
-        "format:prettier": "prettier \"**/*.js\" --write --ignore-path .gitignore",
         "lint": "npm run lint:eslint && npm run lint:prettier",
         "format": "npm run format:eslint && npm run format:prettier",
         "scss": "node-sass --watch src/assets/sass -o src/assets/css",
@@ -17,8 +14,7 @@
     "license": "ISC",
     "repository": "https://github.com/szilijanos/wazza.git",
     "devDependencies": {
-        "@open-wc/eslint-config": "^2.0.0",
-        "@open-wc/prettier-config": "^0.1.10",
+        "@open-wc/eslint-config": "^2.0.4",
         "eslint": "^6.1.0",
         "husky": "^1.0.0",
         "lint-staged": "^8.0.0",
@@ -26,31 +22,50 @@
     },
     "eslintConfig": {
         "extends": [
-            "@open-wc/eslint-config",
-            "eslint-config-prettier"
+            "@open-wc/eslint-config"
         ],
         "rules": {
             "indent": [
                 "error",
                 4
+            ],
+            "max-len": [
+                "error",
+                {
+                    "code": 100,
+                    "ignoreComments": true,
+                    "ignoreTemplateLiterals": true
+                }
+            ],
+            "operator-linebreak": [
+                "error",
+                "after",
+                {
+                    "overrides": {
+                        "&&": "before",
+                        "||": "before",
+                        "?": "before",
+                        ":": "before"
+                    }
+                }
+            ],
+            "comma-dangle": [
+                "error",
+                "only-multiline"
+            ],
+            "arrow-parens": [
+                "error",
+                "always"
             ]
         },
         "overrides": [
             {
                 "files": [
-                    "*.test.js",
-                    "karma.conf.js"
+                    "**/mockData/*.js"
                 ],
                 "rules": {
-                    "import/no-extraneous-dependencies": "off"
-                }
-            },
-            {
-                "files": [
-                    "*.test.js"
-                ],
-                "rules": {
-                    "no-unused-expressions": "off"
+                    "max-len": "off",
+                    "quote-props": "off"
                 }
             }
         ]
@@ -63,7 +78,6 @@
     "lint-staged": {
         "*.js": [
             "eslint --fix",
-            "prettier --write",
             "git add"
         ]
     },

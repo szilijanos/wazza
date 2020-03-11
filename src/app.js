@@ -22,7 +22,6 @@ template.innerHTML = `
     <app-header></app-header>
 
     <main>
-        <!-- TODO temporary placement of all pages until developed, then each goes to its own page, in a routed manner -->
         <search-page></search-page>
         <routes-page></routes-page>
         <schedules-page></schedules-page>
@@ -58,10 +57,11 @@ const init = async () => {
         return;
     }
 
-    await navigator.serviceWorker.register('/src/service-worker.js').catch(error => {
+    await navigator.serviceWorker.register('/src/service-worker.js')
+        .catch((error) => {
         // TODO use this to notify the users the limitations this implies
-        console.log('Service worker registration failed, error:', error);
-    });
+            console.log('Service worker registration failed, error:', error);
+        });
 
     if (!window.customElements.get('my-schedules-app')) {
         await idbService.getInstance();

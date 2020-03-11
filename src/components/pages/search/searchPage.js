@@ -49,7 +49,7 @@ const registerComponent = () => {
                 };
 
                 pageState.routes.value.savedRoutes.handlers = [
-                    event => SearchPage.dispatchRoutesUpdate(event),
+                    (event) => SearchPage.dispatchRoutesUpdate(event)
                 ];
             }
 
@@ -80,8 +80,10 @@ const registerComponent = () => {
             static dispatchRoutesUpdate(event) {
                 document.dispatchEvent(
                     new CustomEvent('Routes::Update', {
-                        detail: { ...event.newValue },
-                    }),
+                        detail: {
+                            ...event.newValue
+                        }
+                    })
                 );
             }
 

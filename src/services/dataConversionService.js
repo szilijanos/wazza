@@ -61,33 +61,33 @@ function isLocalTransportNecessaryAfter(item) {
 }
 
 const departure = {
-    getTimeString: item => getTimeStringFromMinutes(item[map.departureTime]),
-    getStationName: item => getStationName(item, map.departureStation),
-    getStationCity: item => getStationCity(item, map.departureStation),
+    getTimeString: (item) => getTimeStringFromMinutes(item[map.departureTime]),
+    getStationName: (item) => getStationName(item, map.departureStation),
+    getStationCity: (item) => getStationCity(item, map.departureStation),
 };
 
 const arrival = {
-    getTimeString: item => getTimeStringFromMinutes(item[map.arrivalTime]),
-    getStationName: item => getStationName(item, map.arrivalStation),
-    getStationCity: item => getStationCity(item, map.arrivalStation),
+    getTimeString: (item) => getTimeStringFromMinutes(item[map.arrivalTime]),
+    getStationName: (item) => getStationName(item, map.arrivalStation),
+    getStationCity: (item) => getStationCity(item, map.arrivalStation),
 };
 
 const route = {
-    getDaysRunning: item => item[map.daysRunning],
-    getDistance: item => Number(item[map.distance] / 1000),
-    getTotalDistance: routeItemArray =>
-        routeItemArray.reduce((acc, item) => acc + Number(item[map.distance] / 1000), 0),
-    getDurationInMinutes: item => item[map.arrivalTime] - item[map.departureTime],
-    getTotalTimeString: routeItemArray =>
-        getTimeStringFromMinutes(
-            routeItemArray[routeItemArray.length - 1][map.arrivalTime] -
+    getDaysRunning: (item) => item[map.daysRunning],
+    getDistance: (item) => Number(item[map.distance] / 1000),
+    getTotalDistance: (routeItemArray) => routeItemArray.reduce(
+        (acc, item) => acc + Number(item[map.distance] / 1000), 0,
+    ),
+    getDurationInMinutes: (item) => item[map.arrivalTime] - item[map.departureTime],
+    getTotalTimeString: (routeItemArray) => getTimeStringFromMinutes(
+        routeItemArray[routeItemArray.length - 1][map.arrivalTime] -
                 routeItemArray[0][map.departureTime],
-        ),
+    ),
     getVehicleDetails,
     isLocalTransportNecessaryAfter,
 };
 
-const extract = rawData => {
+const extract = (rawData) => {
     const parsed = JSON.parse(rawData);
 
     const { status, results } = parsed;

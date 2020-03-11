@@ -10,7 +10,7 @@ template.innerHTML = `
     </div>
 `;
 
-const registerComponent = dependencies => {
+const registerComponent = (dependencies) => {
     window.customElements.define(
         'route-item',
         class RouteItem extends HTMLElement {
@@ -36,7 +36,7 @@ const registerComponent = dependencies => {
                 this.$routeItemDeleteCta.addEventListener('click', this.routeDeleteHandler);
 
                 pageState.schedules.value.selectedRouteSchedules.handlers = [
-                    event => RouteItem.dispatchSchedulesUpdate(event),
+                    (event) => RouteItem.dispatchSchedulesUpdate(event)
                 ];
             }
 
@@ -55,22 +55,24 @@ const registerComponent = dependencies => {
 
             showSchedulesForRoute() {
                 // TODO
-                idbService.getRouteSchedules(this.itemData).then(schedules => {
-                    pageState.schedules.value.selectedRouteSchedules = [
-                        ...Object.values(schedules.result.results.talalatok),
-                    ];
+                idbService.getRouteSchedules(this.itemData)
+                    .then((schedules) => {
+                        pageState.schedules.value.selectedRouteSchedules = [
+                            ...Object.values(schedules.result.results.talalatok),
+                        ];
 
-                    pageState.schedules.value.selectedRouteSchedules.handlers = [
-                        event => RouteItem.dispatchSchedulesUpdate(event),
-                    ];
-                });
+                        pageState.schedules.value.selectedRouteSchedules.handlers = [
+                            (event) => RouteItem.dispatchSchedulesUpdate(event)
+                        ];
+                    });
             }
 
             deleteRoute() {
                 // TODO confirmation popup
-                idbService.deleteRoute(this.itemData).then(schedules => {
-                    pageState.routes.value.savedRoutes = [...schedules];
-                });
+                idbService.deleteRoute(this.itemData)
+                    .then((schedules) => {
+                        pageState.routes.value.savedRoutes = [...schedules];
+                    });
             }
 
             render() {
@@ -88,9 +90,9 @@ const registerComponent = dependencies => {
 
 const init = async () => {
     if (!window.customElements.get('route-item')) {
-        const style = await fetch('./assets/css/routeItemStyles.css').then(response =>
-            response.text(),
-        );
+        const style =
+            await fetch('./assets/css/routeItemStyles.css')
+                .then((response) => response.text());
 
         registerComponent({ style });
     }

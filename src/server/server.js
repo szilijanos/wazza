@@ -16,10 +16,10 @@ function sendOutboundRequest(payload) {
     };
 
     return new Promise((resolve, reject) => {
-        const req = https.request(options, res => {
+        const req = https.request(options, (res) => {
             const chunks = [];
 
-            res.on('data', chunk => {
+            res.on('data', (chunk) => {
                 chunks.push(chunk);
             });
 
@@ -28,7 +28,7 @@ function sendOutboundRequest(payload) {
                 resolve(body);
             });
 
-            res.on('error', error => {
+            res.on('error', (error) => {
                 console.error(error);
                 reject(error);
             });
@@ -48,7 +48,7 @@ function serve() {
 
         const bodyChunks = [];
 
-        request.on('data', chunk => {
+        request.on('data', (chunk) => {
             bodyChunks.push(chunk);
         });
 
@@ -56,17 +56,17 @@ function serve() {
             const body = Buffer.concat(bodyChunks);
 
             sendOutboundRequest(body)
-                .then(responseBody => {
+                .then((responseBody) => {
                     response.write(responseBody);
                     response.end();
                 })
-                .catch(err => {
+                .catch((err) => {
                     response.end();
                     throw err;
                 });
         });
 
-        request.on('error', error => {
+        request.on('error', (error) => {
             console.error(error);
             response.end();
         });

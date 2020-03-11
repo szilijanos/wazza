@@ -2,7 +2,7 @@ import dataConversionService from '../../../services/dataConversionService.js';
 
 const template = document.createElement('template');
 
-const registerComponent = dependencies => {
+const registerComponent = (dependencies) => {
     window.customElements.define(
         'schedule-item-details',
         class extends HTMLElement {
@@ -25,12 +25,12 @@ const registerComponent = dependencies => {
                         </div>
                     </div>
                     <div class="middle">
-                        <div class="city">${dataConversionService.departure.getStationCity(
-                            item,
-                        )}</div>
-                        <div class="station">${dataConversionService.departure.getStationName(
-                            item,
-                        )}</div>
+                        <div class="city">
+                            ${dataConversionService.departure.getStationCity(item)}
+                        </div>
+                        <div class="station">
+                            ${dataConversionService.departure.getStationName(item)}
+                        </div>
                         <div class="step-info">
                             <div class="duration">
                                 ${dataConversionService.route.getDistance(item)} km
@@ -45,7 +45,7 @@ const registerComponent = dependencies => {
                     <div class="right"></div>
                 `;
 
-                const buildTransferLine = item => `
+                const buildTransferLine = (item) => `
                     <div class="left">
                         <div class="time">
                             <strong>${dataConversionService.arrival.getTimeString(item)}</strong>
@@ -64,7 +64,7 @@ const registerComponent = dependencies => {
                     <div class="right"></div>
                 `;
 
-                const buildTerminusLine = item => `
+                const buildTerminusLine = (item) => `
                     <div class="left">
                         <div class="time">
                             <strong>${dataConversionService.arrival.getTimeString(item)}</strong>
@@ -91,51 +91,67 @@ const registerComponent = dependencies => {
                     const isMultipleStepsTravel = arr.length > 1;
                     const isInterimStep = isMultipleStepsTravel && !isLastStep;
 
+                    const getFirstStepMarkup = () => {
+                        if (isFirstStep) {
+                            return `
+                                <div class="step departure-station">
+                                    ${buildDepartureLine(item, index)}</div>
+                                `;
+                        }
+                        return '';
+                    };
+
+                    const getTransferStepMarkup = () => {
+                        if (isFirstStep && isMultipleStepsTravel) {
+                            return `
+                                <div class="step transfer">
+                                    ${buildTransferLine(item, index)}
+                                </div>
+                            `;
+                        }
+                        return '';
+                    };
+
+                    const getOneBeforeLastStepMarkup = () => {
+                        if (!isOneBeforeLastStep) {
+                            return `
+                                <div class="step transfer">
+                                    ${buildTransferLine(item, index)}
+                                </div>
+                            `;
+                        }
+                        return '';
+                    };
+
+                    const getInterimStepMarkup = () => {
+                        if (isInterimStep) {
+                            return `
+                                <div class="step interim">
+                                    ${buildDepartureLine(arr[index + 1], index + 1)}
+                                </div>
+                                ${getOneBeforeLastStepMarkup()}
+                            `;
+                        }
+                        return '';
+                    };
+
+                    const getLastStepMarkup = () => {
+                        if (isLastStep) {
+                            return `
+                                <div class="step terminus">
+                                    ${buildTerminusLine(item, index)}
+                                </div>
+                            `;
+                        }
+                        return '';
+                    };
+
                     return `
                         ${acc}
-                        ${
-                            isFirstStep
-                                ? `<div class="step departure-station">${buildDepartureLine(
-                                      item,
-                                      index,
-                                  )}</div>`
-                                : ''
-                        }
-                        ${
-                            isFirstStep && isMultipleStepsTravel
-                                ? `<div class="step transfer">${buildTransferLine(
-                                      item,
-                                      index,
-                                  )}</div>`
-                                : ''
-                        }
-
-                        ${
-                            !isInterimStep
-                                ? ''
-                                : `
-                            <div class="step interim">${buildDepartureLine(
-                                arr[index + 1],
-                                index + 1,
-                            )}</div>
-                            ${
-                                isOneBeforeLastStep
-                                    ? ''
-                                    : `<div class="step transfer">${buildTransferLine(
-                                          item,
-                                          index,
-                                      )}</div>`
-                            }`
-                        }
-
-                        ${
-                            isLastStep
-                                ? `<div class="step terminus">${buildTerminusLine(
-                                      item,
-                                      index,
-                                  )}</div>`
-                                : ''
-                        }
+                        ${getFirstStepMarkup()}
+                        ${getTransferStepMarkup()}
+                        ${getInterimStepMarkup()}
+                        ${getLastStepMarkup()}
                     `;
                 };
 
@@ -157,9 +173,9 @@ const registerComponent = dependencies => {
 
 const init = async () => {
     if (!window.customElements.get('schedule-item-details')) {
-        const style = await fetch('./assets/css/scheduleItemDetailsStyles.css').then(response =>
-            response.text(),
-        );
+        const style =
+            await fetch('./assets/css/scheduleItemDetailsStyles.css')
+                .then((res) => res.text());
 
         registerComponent({ style });
     }

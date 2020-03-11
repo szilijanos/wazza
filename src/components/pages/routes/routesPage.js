@@ -37,9 +37,12 @@ const registerComponent = () => {
                 this.$form = this.root.querySelector('#routes-form');
                 this.routesListChangeHandler = this.routesListUpdateHandler.bind(this);
 
-                idbService.getRoutesList().then(list => {
-                    this.routesListChangeHandler({ detail: list });
-                });
+                idbService.getRoutesList()
+                    .then((list) => {
+                        this.routesListChangeHandler({
+                            detail: list,
+                        });
+                    });
 
                 document.addEventListener('Routes::Update', this.routesListChangeHandler);
             }
@@ -57,7 +60,7 @@ const registerComponent = () => {
                 this.$routesSection.innerHTML = '';
                 const $ul = document.createElement('ul');
 
-                Object.values(this.routesListData).forEach(item => {
+                Object.values(this.routesListData).forEach((item) => {
                     const $li = document.createElement('li');
                     const $routeListItem = document.createElement('route-item');
                     $routeListItem.item = item;

@@ -17,9 +17,7 @@ const schema = {
 };
 
 const traps = {
-    get: (node, prop) =>
-        // console.log('get', {node, prop}, node[prop])
-        node[prop],
+    get: (node, prop) => node[prop],
     set: (node, prop, newValue) => {
         if (prop === 'handlers') {
             // new array of handlers should be assigned, because this won't be triggered on Array#push
@@ -37,13 +35,11 @@ const traps = {
                 // rebind handlers
                 node[prop].handlers = handlers;
 
-                handlers.forEach(fn =>
-                    fn({
-                        eventName: 'onChange',
-                        newValue: node[prop].value,
-                        oldValue,
-                    }),
-                );
+                handlers.forEach((fn) => fn({
+                    eventName: 'onChange',
+                    newValue: node[prop].value,
+                    oldValue,
+                }));
             }
 
             return true;
@@ -60,7 +56,7 @@ function decorate(obj) {
             if (Array.isArray(obj[prop]) && typeof obj[prop] !== 'string') {
                 acc[prop] = new Proxy(
                     {
-                        value: obj[prop].map(item => new Proxy({ value: decorate(item) }, traps)),
+                        value: obj[prop].map((item) => new Proxy({ value: decorate(item) }, traps)),
                     },
                     traps,
                 );
@@ -68,7 +64,9 @@ function decorate(obj) {
             }
 
             if (isObject(obj[prop])) {
-                acc[prop] = { value: decorate(obj[prop]) };
+                acc[prop] = {
+                    value: decorate(obj[prop]),
+                };
                 return acc;
             }
 

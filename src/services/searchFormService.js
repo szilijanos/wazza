@@ -38,14 +38,14 @@ function searchRoute({ from, to }) {
     const serverUrl = 'http://127.0.0.1:5501';
 
     return fetch(serverUrl, requestOptions)
-        .then(response => {
+        .then((response) => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             return response;
         })
-        .then(response => response.text())
-        .catch(error => console.log('error', error)); // TODO
+        .then((response) => response.text())
+        .catch((error) => console.log('error', error)); // TODO
 }
 
 export default {

@@ -43,7 +43,7 @@ template.innerHTML = `
     <schedule-item-details></schedule-item-details>
 `;
 
-const registerComponent = dependencies => {
+const registerComponent = (dependencies) => {
     window.customElements.define(
         'schedule-item',
         class extends HTMLElement {
@@ -61,7 +61,7 @@ const registerComponent = dependencies => {
 
                 this.expandDetails = () => {
                     const haveDetailsExpandedClass = [...this.$details.classList].some(
-                        className => className === 'expanded',
+                        (className) => className === 'expanded'
                     );
 
                     window.requestAnimationFrame(() => {
@@ -83,7 +83,7 @@ const registerComponent = dependencies => {
                 const rawData = this.itemData.kifejtes_postjson.runs;
                 const lastIndex = Object.keys(rawData).length - 1;
 
-                const $ = selector => this.root.querySelector(selector); // TODO: move this into utils
+                const $ = (selector) => this.root.querySelector(selector); // TODO: move this into utils
 
                 $('.departure > span.nro').textContent = String(this.itemData.nro + 1).padStart(
                     2,
@@ -116,27 +116,26 @@ const registerComponent = dependencies => {
                     rawData[lastIndex],
                 );
 
-                const runDayInfo = () =>
-                    Object.values(rawData).reduce((acc, item, index) => {
-                        const current = dataConversionService.route.getDaysRunning(item);
-                        const regexDailyAndWorkdaysOnly = /naponta|munkanapokon/;
+                const runDayInfo = () => Object.values(rawData).reduce((acc, item, index) => {
+                    const current = dataConversionService.route.getDaysRunning(item);
+                    const regexDailyAndWorkdaysOnly = /naponta|munkanapokon/;
 
-                        if (
-                            regexDailyAndWorkdaysOnly.test(current) &&
-                            (index === 0 || acc === current)
-                        ) {
-                            return current;
-                        }
+                    if (
+                        regexDailyAndWorkdaysOnly.test(current)
+                            && (index === 0 || acc === current)
+                    ) {
+                        return current;
+                    }
 
-                        return 'lásd részletek...';
-                    }, '');
+                    return 'lásd részletek...';
+                }, '');
 
                 $('.short-details > span.transfer').innerHTML = `
                     <span class="transferNr">
                         ${lastIndex} átszállás
                     </span> | ${runDayInfo()}`;
 
-                const getVehicleBoxMarkup = item => {
+                const getVehicleBoxMarkup = (item) => {
                     const currentVehicle = dataConversionService.route.getVehicleDetails(item);
 
                     return `<div class="vehicleBox ${currentVehicle.type}">
@@ -165,7 +164,7 @@ const registerComponent = dependencies => {
                     (acc, item, index, arr) => {
                         if (arr.length === 1) {
                             return {
-                                html: `<div class="line" style="width: 100%"></div>`,
+                                html: '<div class="line" style="width: 100%"></div>',
                             };
                         }
 
@@ -215,10 +214,9 @@ const registerComponent = dependencies => {
                         .getTotalTimeString(Object.values(rawData))
                         .split(':')
                         .reduce(
-                            (acc, time, index) =>
-                                `${acc} ${index === 0 ? Number(time) : time} ${
-                                    ['óra', 'perc'][index]
-                                }`,
+                            (acc, time, index) => `${acc} ${index === 0 ? Number(time) : time} ${
+                                ['óra', 'perc'][index]
+                            }`,
                             '',
                         );
 
@@ -239,9 +237,9 @@ const registerComponent = dependencies => {
 
 const init = async () => {
     if (!window.customElements.get('schedule-item')) {
-        const style = await fetch('./assets/css/scheduleItemStyles.css').then(response =>
-            response.text(),
-        );
+        const style =
+            await fetch('./assets/css/scheduleItemStyles.css')
+                .then((res) => res.text());
 
         // Can't this be lazy loaded on first open/expand?
         await customElements.whenDefined('schedule-item-details');
