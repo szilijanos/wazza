@@ -111,11 +111,13 @@ const registerComponent = dependencies => {
                         }
 
                         ${
-                            isInterimStep
-                                ? `
-                            <div class="step interim">
-                                ${buildDepartureLine(arr[index + 1], index + 1)}
-                            </div>
+                            !isInterimStep
+                                ? ''
+                                : `
+                            <div class="step interim">${buildDepartureLine(
+                                arr[index + 1],
+                                index + 1,
+                            )}</div>
                             ${
                                 isOneBeforeLastStep
                                     ? ''
@@ -123,9 +125,7 @@ const registerComponent = dependencies => {
                                           item,
                                           index,
                                       )}</div>`
-                            }
-                        `
-                                : ''
+                            }`
                         }
 
                         ${
