@@ -1,8 +1,8 @@
-// import searchFormService from '../../../services/searchFormService.js';
+import searchFormService from '../../../services/searchFormService.js';
 import dataConversionService from '../../../services/dataConversionService.js';
 
 // TODO remove this and use searchFormService from live data
-import mockData from '../../../mockData/Tihany_Dombovar.js';
+// import mockData from '../../../mockData/Tihany_Dombovar.js';
 
 import idbService from '../../../services/idbService.js';
 
@@ -45,7 +45,7 @@ const registerComponent = () => {
 
                 this.inputs = {
                     $from: this.root.querySelector('input#route_from'),
-                    $to: this.root.querySelector('input#route_to'),
+                    $to: this.root.querySelector('input#route_to')
                 };
 
                 pageState.routes.value.savedRoutes.handlers = [
@@ -62,15 +62,15 @@ const registerComponent = () => {
 
                     const queryData = {
                         from: $from.value,
-                        to: $to.value,
+                        to: $to.value
                     };
 
                     const result = dataConversionService.extract(
                         // LIVE DATA:
-                        // await searchFormService.searchRoute(queryData)
+                        await searchFormService.searchRoute(queryData)
 
                         // MOCK DATA:
-                        JSON.stringify(mockData),
+                        // JSON.stringify(mockData)
                     );
 
                     SearchPage.processResponse(result, queryData);
@@ -88,18 +88,16 @@ const registerComponent = () => {
             }
 
             static async processResponse(result, { from, to }) {
-                if (result.status === 'success') {
-                    const savedRoutesList = await idbService.putRoute({
+                pageState.routes.value.savedRoutes = [
+                    ...(await idbService.putRoute({
                         name: `${from} - ${to}`,
-                        result,
-                    });
+                        result: await result
+                    }))
+                ];
 
-                    pageState.routes.value.savedRoutes = [...savedRoutesList];
-                }
-
-                // TODO handle unsuccessful case
+                // TODO catch - handle unsuccessful case
             }
-        },
+        }
     );
 };
 

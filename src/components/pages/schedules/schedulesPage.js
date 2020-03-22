@@ -52,7 +52,11 @@ const registerComponent = () => {
                 this.schedulesList.forEach((item, index) => {
                     const $li = document.createElement('li');
                     const $scheduleItem = document.createElement('schedule-item');
-                    $scheduleItem.item = { nro: index, ...item };
+
+                    $scheduleItem.item = {
+                        nro: index,
+                        ...item
+                    };
 
                     $li.appendChild($scheduleItem);
                     $ul.appendChild($li);

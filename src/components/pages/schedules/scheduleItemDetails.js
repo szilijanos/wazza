@@ -1,5 +1,3 @@
-import dataConversionService from '../../../services/dataConversionService.js';
-
 const template = document.createElement('template');
 
 const registerComponent = (dependencies) => {
@@ -20,22 +18,22 @@ const registerComponent = (dependencies) => {
                 const buildDepartureLine = (item, index) => `
                     <div class="left">
                         <div class="time">
-                            <strong>${dataConversionService.departure.getTimeString(item)}</strong>
+                            <strong>${item.departure.timeString}</strong>
                             ${index === 0 ? '<br>Indulás' : ''}
                         </div>
                     </div>
                     <div class="middle">
                         <div class="city">
-                            ${dataConversionService.departure.getStationCity(item)}
+                            ${item.departure.city}
                         </div>
                         <div class="station">
-                            ${dataConversionService.departure.getStationName(item)}
+                            ${item.departure.station}
                         </div>
                         <div class="step-info">
                             <div class="duration">
-                                ${dataConversionService.route.getDistance(item)} km
+                                ${item.distance} km
                                 <br>
-                                ${dataConversionService.route.getDurationInMinutes(item)} perc
+                                ${item.durationInMinutes} perc
                             </div>
                             <div></div>
                             <div class="cl"></div>
@@ -48,16 +46,16 @@ const registerComponent = (dependencies) => {
                 const buildTransferLine = (item) => `
                     <div class="left">
                         <div class="time">
-                            <strong>${dataConversionService.arrival.getTimeString(item)}</strong>
+                            <strong>${item.arrival.timeString}</strong>
                         </div>
                     </div>
                     <div class="middle">
                         <div class="step-details">
                             <div class="city">
-                                ${dataConversionService.arrival.getStationCity(item)}
+                                ${item.arrival.city}
                             </div>
                             <div class="station">
-                                ${dataConversionService.arrival.getStationName(item)}
+                                ${item.arrival.station}
                             </div>
                         </div>
                     </div>
@@ -67,17 +65,17 @@ const registerComponent = (dependencies) => {
                 const buildTerminusLine = (item) => `
                     <div class="left">
                         <div class="time">
-                            <strong>${dataConversionService.arrival.getTimeString(item)}</strong>
+                            <strong>${item.arrival.timeString}</strong>
                             <br>Érkezés
                         </div>
                     </div>
                     <div class="middle">
                         <div class="step-details">
                             <div class="city">
-                                ${dataConversionService.arrival.getStationCity(item)}
+                                ${item.arrival.city}
                             </div>
                             <div class="station">
-                                ${dataConversionService.arrival.getStationName(item)}
+                                ${item.arrival.station}
                             </div>
                         </div>
                     </div>
@@ -105,18 +103,18 @@ const registerComponent = (dependencies) => {
                         if (isFirstStep && isMultipleStepsTravel) {
                             return `
                                 <div class="step transfer">
-                                    ${buildTransferLine(item, index)}
+                                    ${buildTransferLine(item)}
                                 </div>
                             `;
                         }
                         return '';
                     };
 
-                    const getOneBeforeLastStepMarkup = () => {
+                    const getNotTheOneBeforeLastStepMarkup = () => {
                         if (!isOneBeforeLastStep) {
                             return `
                                 <div class="step transfer">
-                                    ${buildTransferLine(item, index)}
+                                    ${buildTransferLine(arr[index + 1])}
                                 </div>
                             `;
                         }
@@ -129,7 +127,7 @@ const registerComponent = (dependencies) => {
                                 <div class="step interim">
                                     ${buildDepartureLine(arr[index + 1], index + 1)}
                                 </div>
-                                ${getOneBeforeLastStepMarkup()}
+                                ${getNotTheOneBeforeLastStepMarkup()}
                             `;
                         }
                         return '';
@@ -139,7 +137,7 @@ const registerComponent = (dependencies) => {
                         if (isLastStep) {
                             return `
                                 <div class="step terminus">
-                                    ${buildTerminusLine(item, index)}
+                                    ${buildTerminusLine(item)}
                                 </div>
                             `;
                         }
@@ -155,8 +153,7 @@ const registerComponent = (dependencies) => {
                     `;
                 };
 
-                const rawData = this.details.kifejtes_postjson.runs;
-                const stepsMarkup = Object.values(rawData).reduce(
+                const stepsMarkup = Object.values(this.details.route.steps).reduce(
                     (acc, item, index, arr) => buildDetails(acc, item, index, arr),
                     '',
                 );

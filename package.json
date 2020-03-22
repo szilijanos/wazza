@@ -32,7 +32,7 @@
             "max-len": [
                 "error",
                 {
-                    "code": 100,
+                    "code": 120,
                     "ignoreComments": true,
                     "ignoreTemplateLiterals": true
                 }
@@ -56,6 +56,16 @@
             "arrow-parens": [
                 "error",
                 "always"
+            ],
+            "implicit-arrow-linebreak": [
+                "error",
+                "beside"
+            ],
+            "no-unused-vars": [
+                "error",
+                {
+                    "args": "after-used"
+                }
             ]
         },
         "overrides": [

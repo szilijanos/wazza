@@ -1,4 +1,3 @@
-import dataConversionService from '../../../services/dataConversionService.js';
 import './scheduleItemDetails.js';
 
 const template = document.createElement('template');
@@ -59,6 +58,7 @@ const registerComponent = (dependencies) => {
                 this.$details = this.root.querySelector('schedule-item-details');
                 this.$scheduleItem = this.root.querySelector('.schedule-item-container');
 
+                // TODO make expanded to be a custom attribute
                 this.expandDetails = () => {
                     const haveDetailsExpandedClass = [...this.$details.classList].some(
                         (className) => className === 'expanded'
@@ -79,88 +79,60 @@ const registerComponent = (dependencies) => {
             }
 
             render() {
-                // TODO make a service that builds up a state from the raw data, and get data from there
-                const rawData = this.itemData.kifejtes_postjson.runs;
-                const lastIndex = Object.keys(rawData).length - 1;
+                const lastIndex = Object.keys(this.itemData.route.steps).length - 1;
 
-                const $ = (selector) => this.root.querySelector(selector); // TODO: move this into utils
+                // TODO: move this into utils
+                const $ = (selector) => this.root.querySelector(selector);
 
-                $('.departure > span.nro').textContent = String(this.itemData.nro + 1).padStart(
-                    2,
-                    '0',
-                );
-                $('.departure > span.pref').innerHTML = Object.values(rawData).reduce(
-                    (acc, item) => {
-                        const details = dataConversionService.route.getVehicleDetails(item);
-                        return `${acc}<img alt="${details.type}" class="icon-${details.type}" src="./assets/icons/icon-${details.type}.svg"  width="15" height="20">`;
+                $('.departure > span.nro').textContent = String(this.itemData.nro + 1).padStart(2, '0');
+
+                $('.departure > span.pref').innerHTML = this.itemData.route.steps.reduce(
+                    (acc, step) => {
+                        const { vehicleDetails } = step;
+                        return `${acc}<img alt="${vehicleDetails.type}" class="icon-${vehicleDetails.type}" src="./assets/icons/icon-${vehicleDetails.type}.svg"  width="15" height="20">`;
                     },
                     '',
                 );
 
-                $(
-                    '.departure > span.city',
-                ).textContent = dataConversionService.departure.getStationCity(rawData[0]);
-                $(
-                    '.departure > span.station',
-                ).textContent = dataConversionService.departure.getStationName(rawData[0]);
-                $(
-                    '.departure > span.time',
-                ).textContent = dataConversionService.departure.getTimeString(rawData[0]);
-                $(
-                    '.arrival > span.city',
-                ).textContent = dataConversionService.arrival.getStationCity(rawData[lastIndex]);
-                $(
-                    '.arrival > span.station',
-                ).textContent = dataConversionService.arrival.getStationName(rawData[lastIndex]);
-                $('.arrival > span.time').textContent = dataConversionService.arrival.getTimeString(
-                    rawData[lastIndex],
-                );
+                $('.departure > span.city').textContent = this.itemData.departure.city;
+                $('.departure > span.station').textContent = this.itemData.departure.station;
+                $('.departure > span.time').textContent = this.itemData.departure.timeString;
 
-                const runDayInfo = () => Object.values(rawData).reduce((acc, item, index) => {
-                    const current = dataConversionService.route.getDaysRunning(item);
-                    const regexDailyAndWorkdaysOnly = /naponta|munkanapokon/;
+                $('.arrival > span.city').textContent = this.itemData.arrival.city;
+                $('.arrival > span.station').textContent = this.itemData.arrival.station;
 
-                    if (
-                        regexDailyAndWorkdaysOnly.test(current)
-                            && (index === 0 || acc === current)
-                    ) {
-                        return current;
-                    }
-
-                    return 'lásd részletek...';
-                }, '');
+                $('.arrival > span.time').textContent = this.itemData.arrival.timeString;
 
                 $('.short-details > span.transfer').innerHTML = `
                     <span class="transferNr">
                         ${lastIndex} átszállás
-                    </span> | ${runDayInfo()}`;
+                    </span> | ${this.itemData.route.daysRunning}`;
 
-                const getVehicleBoxMarkup = (item) => {
-                    const currentVehicle = dataConversionService.route.getVehicleDetails(item);
+                const getVehicleBoxMarkup = (step) => {
+                    const { type, lineNumber } = step.vehicleDetails;
 
-                    return `<div class="vehicleBox ${currentVehicle.type}">
-                                ${currentVehicle.lineNumber}
+                    return `<div class="vehicleBox ${type}">
+                                ${lineNumber}
                             </div>`;
                 };
 
-                $('.short-details > div.vehicleDiv').innerHTML = Object.values(rawData).reduce(
-                    (acc, item) => {
-                        if (dataConversionService.route.isLocalTransportNecessaryAfter(item)) {
+                $('.short-details > div.vehicleDiv').innerHTML = this.itemData.route.steps.reduce(
+                    (acc, step) => {
+                        if (step.isLocalTransportNecessaryAfter) {
                             return `${acc}
-                                    ${getVehicleBoxMarkup(item)}
+                                    ${getVehicleBoxMarkup(step)}
                                     <div class="vehicleBox local">Helyi</div>
                                     `.trim();
                         }
 
-                        return `${acc}${getVehicleBoxMarkup(item)}`;
+                        return `${acc}${getVehicleBoxMarkup(step)}`;
                     },
                     '',
                 );
 
-                const totalDistance = dataConversionService.route.getTotalDistance(
-                    Object.values(rawData),
-                );
-                $('.short-details > div.routemap').innerHTML = Object.values(rawData).reduce(
+                const { totalDistance } = this.itemData.route;
+
+                $('.short-details > div.routemap').innerHTML = Object.values(this.itemData.route.steps).reduce(
                     (acc, item, index, arr) => {
                         if (arr.length === 1) {
                             return {
@@ -168,7 +140,7 @@ const registerComponent = (dependencies) => {
                             };
                         }
 
-                        const itemDistance = dataConversionService.route.getDistance(item);
+                        const itemDistance = item.distance;
 
                         if (index === 0) {
                             const currentOffset = itemDistance;
@@ -210,8 +182,7 @@ const registerComponent = (dependencies) => {
 
                 const getTravelSummaryData = () => {
                     const km = totalDistance.toFixed(Number.isInteger(totalDistance) ? 0 : 1);
-                    const duration = dataConversionService.route
-                        .getTotalTimeString(Object.values(rawData))
+                    const duration = this.itemData.route.totalTime
                         .split(':')
                         .reduce(
                             (acc, time, index) => `${acc} ${index === 0 ? Number(time) : time} ${

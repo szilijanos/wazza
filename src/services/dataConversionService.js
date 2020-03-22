@@ -26,16 +26,15 @@ const vehicles = [
     {
         type: 'ship',
         keyOfLineCode: map.trainLineCode,
-    },
+    }
 ];
 
 function getVehicleDetails(item) {
     return {
         type: vehicles[item[map.vehicleType] - 1].type,
-        lineNumber:
-            item[map.lineName].length > 0
-                ? item[map.lineName]
-                : item[vehicles[item[map.vehicleType] - 1].keyOfLineCode],
+        lineNumber: item[map.lineName].length > 0
+            ? item[map.lineName]
+            : item[vehicles[item[map.vehicleType] - 1].keyOfLineCode]
     };
 }
 
@@ -60,51 +59,101 @@ function isLocalTransportNecessaryAfter(item) {
     return item[map.interStationTransitMethod] === 'Vehicle';
 }
 
-const departure = {
-    getTimeString: (item) => getTimeStringFromMinutes(item[map.departureTime]),
-    getStationName: (item) => getStationName(item, map.departureStation),
-    getStationCity: (item) => getStationCity(item, map.departureStation),
+function getTotalTimeString(routeItemArray) {
+    return getTimeStringFromMinutes(
+        routeItemArray[routeItemArray.length - 1][map.arrivalTime] - routeItemArray[0][map.departureTime]
+    );
+}
+
+const buildExtractedResults = (rawResults) => {
+    const KEY_NAME_MAP = {
+        results: 'talalatok',
+        details: 'kifejtes_postjson'
+    };
+
+    const rawResultsArray = [
+        ...Object.values(rawResults[KEY_NAME_MAP.results])
+    ].reduce((acc, rawScheduleItem) => {
+        acc.push(rawScheduleItem[KEY_NAME_MAP.details].runs);
+        return acc;
+    }, []);
+
+    const extractedData =
+        rawResultsArray.reduce((acc, item) => {
+            const lastIndex = Object.keys(item).length - 1;
+
+            const dataAssembly = {
+                route: {
+                    steps: Object.values(item)
+                        .reduce((accSteps, step) => {
+                            accSteps.push({
+                                vehicleDetails: getVehicleDetails(step),
+                                isLocalTransportNecessaryAfter: isLocalTransportNecessaryAfter(step),
+                                departure: {
+                                    timeString: getTimeStringFromMinutes(step[map.departureTime]),
+                                    city: getStationCity(step, map.departureStation),
+                                    station: getStationName(step, map.departureStation)
+                                },
+                                arrival: {
+                                    timeString: getTimeStringFromMinutes(step[map.arrivalTime]),
+                                    city: getStationCity(step, map.arrivalStation),
+                                    station: getStationName(step, map.arrivalStation)
+                                },
+                                distance: Number(step[map.distance] / 1000),
+                                durationInMinutes: step[map.arrivalTime] - step[map.departureTime],
+                            });
+                            return accSteps;
+                        }, []),
+                    daysRunning: Object.values(item)
+                        .reduce((accDaysRunning, step, index) => {
+                            const current = step.dayRunning;
+                            const regexDailyAndWorkdaysOnly = /naponta|munkanapokon/;
+
+                            if (regexDailyAndWorkdaysOnly.test(current)
+                                    && (index === 0 || accDaysRunning === current)
+                            ) {
+                                return current;
+                            }
+
+                            return 'lásd részletek...';
+                        }, ''),
+                    totalTime: getTotalTimeString(Object.values(item)),
+                    totalDistance: Object.values(item)
+                        .reduce((accDist, step) => accDist + Number(step[map.distance] / 1000), 0),
+                },
+                arrival: {
+                    city: getStationCity(item[lastIndex], map.arrivalStation),
+                    station: getStationName(item[lastIndex], map.arrivalStation),
+                    timeString: getTimeStringFromMinutes(item[lastIndex][map.arrivalTime])
+                },
+                departure: {
+                    city: getStationCity(item[0], map.departureStation),
+                    station: getStationName(item[0], map.departureStation),
+                    timeString: getTimeStringFromMinutes(item[0][map.departureTime])
+                }
+            };
+
+            acc.push(dataAssembly);
+
+            return acc;
+        }, []);
+
+    return extractedData;
 };
 
-const arrival = {
-    getTimeString: (item) => getTimeStringFromMinutes(item[map.arrivalTime]),
-    getStationName: (item) => getStationName(item, map.arrivalStation),
-    getStationCity: (item) => getStationCity(item, map.arrivalStation),
-};
-
-const route = {
-    getDaysRunning: (item) => item[map.daysRunning],
-    getDistance: (item) => Number(item[map.distance] / 1000),
-    getTotalDistance: (routeItemArray) => routeItemArray.reduce(
-        (acc, item) => acc + Number(item[map.distance] / 1000), 0,
-    ),
-    getDurationInMinutes: (item) => item[map.arrivalTime] - item[map.departureTime],
-    getTotalTimeString: (routeItemArray) => getTimeStringFromMinutes(
-        routeItemArray[routeItemArray.length - 1][map.arrivalTime] -
-                routeItemArray[0][map.departureTime],
-    ),
-    getVehicleDetails,
-    isLocalTransportNecessaryAfter,
-};
-
-const extract = (rawData) => {
+// TODO move the whole extraction logic to the backend
+const extract = (rawData) => new Promise((resolve, reject) => {
     const parsed = JSON.parse(rawData);
 
     const { status, results } = parsed;
+    if (status === 'success') {
+        resolve(buildExtractedResults(results));
+        return;
+    }
 
-    const extracted = {
-        status,
-        results,
-    };
-
-    return extracted;
-};
+    reject(new Error('Data server rejected request'));
+});
 
 export default {
-    arrival,
-    departure,
-    route,
-
-    // IN PROGRESS: this will be the only interface, to convert live data into the data to be stored (less size)
-    extract,
+    extract
 };

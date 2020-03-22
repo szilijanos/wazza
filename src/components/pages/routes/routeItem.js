@@ -57,9 +57,7 @@ const registerComponent = (dependencies) => {
                 // TODO
                 idbService.getRouteSchedules(this.itemData)
                     .then((schedules) => {
-                        pageState.schedules.value.selectedRouteSchedules = [
-                            ...Object.values(schedules.result.results.talalatok),
-                        ];
+                        pageState.schedules.value.selectedRouteSchedules = schedules.result;
 
                         pageState.schedules.value.selectedRouteSchedules.handlers = [
                             (event) => RouteItem.dispatchSchedulesUpdate(event)
