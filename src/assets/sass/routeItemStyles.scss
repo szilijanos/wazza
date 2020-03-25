@@ -1,6 +1,16 @@
-:host {
-    // TODO
-    display: block;
-    height: 30px;
-    outline: 1px solid red;
+
+.route {
+    width: 100%;
+    line-height: 200%;
+    display: inline-flex;
+    justify-content: space-between;
+    border: 1px solid grey;
+}
+
+.description {
+    flex-grow: 1;
+}
+
+button.delete {
+    background-color: red;
 }
