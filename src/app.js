@@ -10,7 +10,7 @@ const template = document.createElement('template');
 template.innerHTML = `
     <style>
         :host {
-            width: 880px;
+            width: 720px;
             margin: 0 auto;
             display: none;
             background-color: #383842;

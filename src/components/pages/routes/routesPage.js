@@ -4,23 +4,9 @@ import idbService from '../../../services/idbService.js';
 
 const template = document.createElement('template');
 
-template.innerHTML = `
-    <style>
-        ul {
-            padding-inline-start: 0;
-            margin-block-start:   0;
-            margin-block-end:     0;
-        }
+template.innerHTML = '<section id="routes"></section>';
 
-        li {
-            list-style-type: none;
-        }
-    </style>
-
-    <section id="routes"></section>
-`;
-
-const registerComponent = () => {
+const registerComponent = (dependencies) => {
     window.customElements.define(
         'routes-page',
         class extends HTMLElement {
@@ -28,6 +14,10 @@ const registerComponent = () => {
                 super();
                 this.root = this.attachShadow({ mode: 'open' });
                 this.root.appendChild(template.content.cloneNode(true));
+
+                const styleNode = document.createElement('style');
+                styleNode.innerHTML = dependencies.style;
+                this.root.prepend(styleNode);
 
                 this.$routesSection = this.root.querySelector('#routes');
                 this.routesListData = [];
@@ -79,9 +69,11 @@ const registerComponent = () => {
 
 const init = async () => {
     if (!window.customElements.get('routes-page')) {
-        await customElements.whenDefined('route-item');
+        const style =
+            await fetch('./assets/css/routePageStyles.css')
+                .then((response) => response.text());
 
-        registerComponent();
+        registerComponent({ style });
     }
 };
 

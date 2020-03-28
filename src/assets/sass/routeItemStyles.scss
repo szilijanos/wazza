@@ -5,12 +5,24 @@
     display: inline-flex;
     justify-content: space-between;
     border: 1px solid grey;
+    font-size: 2em;
 }
 
 .description {
     flex-grow: 1;
+    padding: 8px 0;
+    border: inherit;
+    margin-right: 4px;
+    background-color: lightgray;
+}
+
+.date {
+    padding: 8px 0;
+    border: inherit;
+    margin-right: 4px;
+    background-color: lightgray;
 }
 
 button.delete {
-    background-color: red;
+    background-color: pink;
 }

@@ -35,11 +35,11 @@ const getRouteSchedules = (routeKey) => new Promise((resolve, reject) => {
     };
 });
 
-const addRoute = ({ name, result }) => new Promise((resolve, reject) => {
+const addRoute = ({ name, date, result }) => new Promise((resolve, reject) => {
     const request = pageState.dbInstance.value
         .transaction(['routes'], 'readwrite')
         .objectStore('routes')
-        .add({ name, result });
+        .add({ name, date, result });
 
     request.onsuccess = () => {
         resolve(getRoutesList());
@@ -50,11 +50,11 @@ const addRoute = ({ name, result }) => new Promise((resolve, reject) => {
     };
 });
 
-const putRoute = ({ name, result }) => new Promise((resolve, reject) => {
+const putRoute = ({ name, date, result }) => new Promise((resolve, reject) => {
     const request = pageState.dbInstance.value
         .transaction(['routes'], 'readwrite')
         .objectStore('routes')
-        .put({ name, result });
+        .put({ name, date, result });
 
     request.onsuccess = () => {
         resolve(getRoutesList());

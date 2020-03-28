@@ -1,8 +1,8 @@
-import searchFormService from '../../../services/searchFormService.js';
+// import searchFormService from '../../../services/searchFormService.js';
 import dataConversionService from '../../../services/dataConversionService.js';
 
 // TODO remove this and use searchFormService from live data
-// import mockData from '../../../mockData/Tihany_Dombovar.js';
+import mockData from '../../../mockData/Tihany_Dombovar.js';
 
 import idbService from '../../../services/idbService.js';
 
@@ -13,9 +13,9 @@ const template = document.createElement('template');
 template.innerHTML = `
     <section id="search">
         <form id="search-form" novalidate>
-            <input type="text" id="route_from" placeholder="Honnan?" autofocus autocomplete="off">
-            <input type="text" id="route_to" placeholder="Hová?" autocomplete="off">
-            <input type="date">
+            <input type="text" id="routeFrom" placeholder="Honnan?" autofocus autocomplete="off">
+            <input type="text" id="routeTo" placeholder="Hová?" autocomplete="off">
+            <input type="date" id="routeDate">
             <input type="time">
 
             <!-- TODO: REMOVE INLINE STYLE WHEN STYLED FROM SCSS -->
@@ -44,8 +44,9 @@ const registerComponent = () => {
                 this.$form.addEventListener('submit', this.handleSubmit.bind(this));
 
                 this.inputs = {
-                    $from: this.root.querySelector('input#route_from'),
-                    $to: this.root.querySelector('input#route_to')
+                    $from: this.root.querySelector('input#routeFrom'),
+                    $to: this.root.querySelector('input#routeTo'),
+                    $date: this.root.querySelector('input#routeDate'),
                 };
 
                 pageState.routes.value.savedRoutes.handlers = [
@@ -58,19 +59,20 @@ const registerComponent = () => {
 
                 // TODO: Validation...
                 if (this.isValid) {
-                    const { $from, $to } = this.inputs;
+                    const { $from, $to, $date } = this.inputs;
 
                     const queryData = {
                         from: $from.value,
-                        to: $to.value
+                        to: $to.value,
+                        date: $date.value
                     };
 
                     const result = dataConversionService.extract(
                         // LIVE DATA:
-                        await searchFormService.searchRoute(queryData)
+                        // await searchFormService.searchRoute(queryData)
 
                         // MOCK DATA:
-                        // JSON.stringify(mockData)
+                        JSON.stringify(mockData)
                     );
 
                     SearchPage.processResponse(result, queryData);
@@ -87,11 +89,12 @@ const registerComponent = () => {
                 );
             }
 
-            static async processResponse(result, { from, to }) {
+            static async processResponse(result, { from, to, date }) {
                 pageState.routes.value.savedRoutes = [
                     ...(await idbService.putRoute({
                         name: `${from} - ${to}`,
-                        result: await result
+                        result: await result,
+                        date // TODO use date in the route list
                     }))
                 ];
 

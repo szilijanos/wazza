@@ -5,6 +5,7 @@ import pageState from '../../../state/pageState.js';
 const template = document.createElement('template');
 template.innerHTML = `
     <div class='route'>
+        <span class="date">2020.02.20</span>
         <span class="description"></span>
         <button class="delete">Törlés</button>
     </div>
