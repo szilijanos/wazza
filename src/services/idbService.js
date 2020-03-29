@@ -20,26 +20,26 @@ const getRoutesList = () => new Promise((resolve, reject) => {
     };
 });
 
-const getRouteSchedules = (routeKey) => new Promise((resolve, reject) => {
+const getRouteSchedules = ({ key }) => new Promise((resolve, reject) => {
     const request = pageState.dbInstance.value
         .transaction(['routes'], 'readonly')
         .objectStore('routes')
-        .get(routeKey);
+        .get(key);
 
     request.onsuccess = () => {
         resolve(request.result);
     };
 
     request.onerror = (event) => {
-        reject(new Error(`Unable to read data for ${routeKey} is already exist in database! (${event})`));
+        reject(new Error(`Unable to read data for ${key} is already exist in database! (${event})`));
     };
 });
 
-const addRoute = ({ name, date, result }) => new Promise((resolve, reject) => {
+const addRoute = ({ name, result }) => new Promise((resolve, reject) => {
     const request = pageState.dbInstance.value
         .transaction(['routes'], 'readwrite')
         .objectStore('routes')
-        .add({ name, date, result });
+        .add({ name, result });
 
     request.onsuccess = () => {
         resolve(getRoutesList());
@@ -50,11 +50,11 @@ const addRoute = ({ name, date, result }) => new Promise((resolve, reject) => {
     };
 });
 
-const putRoute = ({ name, date, result }) => new Promise((resolve, reject) => {
+const putRoute = ({ name, result }) => new Promise((resolve, reject) => {
     const request = pageState.dbInstance.value
         .transaction(['routes'], 'readwrite')
         .objectStore('routes')
-        .put({ name, date, result });
+        .put({ name, result });
 
     request.onsuccess = () => {
         resolve(getRoutesList());
@@ -65,18 +65,18 @@ const putRoute = ({ name, date, result }) => new Promise((resolve, reject) => {
     };
 });
 
-const deleteRoute = (name) => new Promise((resolve, reject) => {
+const deleteRoute = (key) => new Promise((resolve, reject) => {
     const request = pageState.dbInstance.value
         .transaction(['routes'], 'readwrite')
         .objectStore('routes')
-        .delete(name);
+        .delete(key);
 
     request.onsuccess = () => {
         resolve(getRoutesList());
     };
 
     request.onerror = (event) => {
-        reject(new Error(`Unable to delete key: ${name}, (${event})`));
+        reject(new Error(`Unable to delete key: ${key}, (${event})`));
     };
 });
 

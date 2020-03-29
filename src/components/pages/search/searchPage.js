@@ -90,11 +90,18 @@ const registerComponent = () => {
             }
 
             static async processResponse(result, { from, to, date }) {
+                // Todo: proper async validation to city names
+                const dateRegex = /^(\d{4}-\d{2}-\d{2})/;
+                if (!dateRegex.test(date)
+                    || from.length === 0
+                    || to.length === 0) {
+                    return;
+                }
+
                 pageState.routes.value.savedRoutes = [
                     ...(await idbService.putRoute({
-                        name: `${from} - ${to}`,
+                        name: `${date} - ${from} - ${to}`,
                         result: await result,
-                        date // TODO use date in the route list
                     }))
                 ];
 

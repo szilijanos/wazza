@@ -5,7 +5,7 @@ import pageState from '../../../state/pageState.js';
 const template = document.createElement('template');
 template.innerHTML = `
     <div class='route'>
-        <span class="date">2020.02.20</span>
+        <span class="date"></span>
         <span class="description"></span>
         <button class="delete">Törlés</button>
     </div>
@@ -26,6 +26,7 @@ const registerComponent = (dependencies) => {
 
                 this.$routeItem = this.root.querySelector('.route');
                 this.$routeItemDescription = this.$routeItem.querySelector('span.description');
+                this.$routeItemDate = this.$routeItem.querySelector('span.date');
                 this.$routeItemDeleteCta = this.$routeItem.querySelector('button.delete');
             }
 
@@ -68,19 +69,28 @@ const registerComponent = (dependencies) => {
 
             deleteRoute() {
                 // TODO confirmation popup
-                idbService.deleteRoute(this.itemData)
+                idbService.deleteRoute(this.itemData.key)
                     .then((schedules) => {
                         pageState.routes.value.savedRoutes = [...schedules];
                     });
             }
 
             render() {
-                const htmlContent = this.itemData;
-                this.$routeItemDescription.innerHTML = htmlContent;
+                const { dateContent, descriptionContent } = this.itemData;
+
+                this.$routeItemDescription.textContent = descriptionContent;
+                this.$routeItemDate.textContent = dateContent;
             }
 
             set item(value) {
-                this.itemData = value;
+                // e.g.: 2020-01-01 - from - to
+                const result = value.match(/^(\d{4}-\d{2}-\d{2}) - (.*)$/);
+                if (!result) {
+                    return;
+                }
+
+                const [key, dateContent, descriptionContent] = result;
+                this.itemData = { key, dateContent, descriptionContent };
                 this.render();
             }
         },
