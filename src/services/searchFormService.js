@@ -1,11 +1,11 @@
-function searchRoute({ from, to }) {
+function searchRoute({ from, to, date }) {
     const myHeaders = new Headers();
     myHeaders.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 
     const queryJson = {
         func: 'getRoutes',
         params: {
-            datum: '2020-05-17',
+            datum: date,
             erk_stype: 'megallo',
             ext_settings: 'block',
             filtering: 0,

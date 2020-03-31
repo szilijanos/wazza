@@ -1,10 +1,10 @@
-// import searchFormService from '../../../services/searchFormService.js';
+import searchFormService from '../../../services/searchFormService.js';
 import dataConversionService from '../../../services/dataConversionService.js';
+import idbService from '../../../services/idbService.js';
+import dateTimeService from '../../../services/dateTimeService.js';
 
 // TODO remove this and use searchFormService from live data
-import mockData from '../../../mockData/Tihany_Dombovar.js';
-
-import idbService from '../../../services/idbService.js';
+// import mockData from '../../../mockData/Tihany_Dombovar.js';
 
 import pageState from '../../../state/pageState.js';
 
@@ -49,6 +49,8 @@ const registerComponent = () => {
                     $date: this.root.querySelector('input#routeDate'),
                 };
 
+                this.inputs.$date.value = dateTimeService.date.tomorrow();
+
                 pageState.routes.value.savedRoutes.handlers = [
                     (event) => SearchPage.dispatchRoutesUpdate(event)
                 ];
@@ -69,10 +71,10 @@ const registerComponent = () => {
 
                     const result = dataConversionService.extract(
                         // LIVE DATA:
-                        // await searchFormService.searchRoute(queryData)
+                        await searchFormService.searchRoute(queryData)
 
                         // MOCK DATA:
-                        JSON.stringify(mockData)
+                        // JSON.stringify(mockData)
                     );
 
                     SearchPage.processResponse(result, queryData);
