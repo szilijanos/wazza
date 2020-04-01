@@ -3,8 +3,10 @@
     "version": "1.0.0",
     "description": "This app provides an alternative interface to menetrendek.hu with advanced features of storing and retreiving public transport schedules of Hungary",
     "scripts": {
-        "lint": "npm run eslint --ext .js,.html . --ignore-path .gitignore",
-        "format": "npm run eslint --ext .js,.html . --fix --ignore-path .gitignore",
+        "lint:eslint": "eslint --ext .js,.html . --ignore-path .gitignore",
+        "format:eslint": "eslint --ext .js,.html . --fix --ignore-path .gitignore",
+        "lint": "npm run lint:eslint",
+        "format": "npm run format:eslint",
         "scss": "node-sass --watch src/assets/sass -o src/assets/css",
         "server": "node ./src/server/server.js"
     },
