@@ -92,6 +92,6 @@
         ]
     },
     "dependencies": {
-        "follow-redirects": "^1.10.0"
+        "follow-redirects": "^1.14.7"
     }
 }
