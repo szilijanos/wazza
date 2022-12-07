@@ -17,7 +17,7 @@
         "@open-wc/eslint-config": "^2.0.4",
         "eslint": "^6.1.0",
         "husky": "^1.0.0",
-        "lint-staged": "^8.0.0",
+        "lint-staged": "^13.1.0",
         "node-sass": "^7.0.0"
     },
     "eslintConfig": {
